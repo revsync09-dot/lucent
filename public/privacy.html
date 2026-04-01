@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Protocol — Hyperions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/index.css">
+    <style>
+        .legal-content {
+            max-width: 800px;
+            margin: 12rem auto 8rem;
+            padding: 0 2rem;
+        }
+        .legal-content h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+        }
+        .legal-content h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1rem;
+            color: var(--primary);
+        }
+        .legal-content p, .legal-content li {
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-canvas">
+        <div class="mesh-gradient"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <header class="nav-container">
+        <a href="/" class="nav-logo">
+            <img src="/logo.png" alt="Logo" class="logo-icon">
+            <span>Hyperions</span>
+        </a>
+        <a href="/" class="apply-btn-nav">Back to Terminal</a>
+    </header>
+
+    <main class="legal-content">
+        <h1>Privacy Protocol</h1>
+
+        <section>
+            <h2>1. Data Acquisition</h2>
+            <p>We only collect essential Discord identity data (User ID, Username) required to facilitate ticket coordination and anti-fraud monitoring within our carry network.</p>
+        </section>
+
+        <section>
+            <h2>2. Information Usage</h2>
+            <p>Your data is used solely for identifying you within the ticket system, managing your vouch history, and processing helper applications. We do not sell or share this data with external third parties.</p>
+        </section>
+
+        <section>
+            <h2>3. Secure Storage</h2>
+            <p>All sensitive operational data is stored securely using industry-standard protocols. Verification data is handled through official Discord OAuth2 systems to ensure maximum security.</p>
+        </section>
+
+        <section>
+            <h2>4. Data Retention</h2>
+            <p>User metrics and ticket logs are archived for history and accountability purposes. You may request data removal by contacting a network administrator via the Support widget.</p>
+        </section>
+    </main>
+
+    <footer class="ultra-footer">
+        <div class="footer-bottom">
+            <span>&copy; 2026 Hyperions Network. All signals operational.</span>
+        </div>
+    </footer>
+
+    <!-- Cursor Elements -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <script>
+        const dot  = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        const glow = document.getElementById('cursorGlow');
+        let mx = 0, my = 0;
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            if (dot) dot.style.transform  = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+            if (ring) ring.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+            if (glow) glow.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+        });
+        document.querySelectorAll('a, button, .nav-logo').forEach(el => {
+            if (ring) {
+                el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+                el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+            }
+        });
+    </script>
+</body>
+</html>

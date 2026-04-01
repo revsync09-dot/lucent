@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Helper Application | Hyperions</title>
+
+    <meta name="description" content="Official Hyperions Helper Application. Apply to join our selection of elite game helpers.">
+    <meta property="og:title" content="Hyperions | Helper Application" />
+    <meta property="og:image" content="/logo.png">
+    <meta name="theme-color" content="#8b5cf6">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="helper-application.css?v=fresh_emojis_v13" />
+    <link rel="icon" type="image/png" href="logo.png" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+</head>
+<body>
+
+  <style>
+    .ha-loader {
+      position:fixed; inset:0; z-index:9000; background:#000;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.75rem;
+      transition:opacity .6s cubic-bezier(.16,1,.3,1), visibility .6s;
+    }
+    .ha-loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+    .ha-loader-logo { width:72px; height:72px; border-radius:20px; animation:haPulse 2s ease-in-out infinite; }
+    @keyframes haPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(.97)} }
+    .ha-loader-track { width:200px; height:2px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; }
+    .ha-loader-fill { height:100%; width:0; background:linear-gradient(90deg,#7c6fff,#a78bfa); border-radius:99px; transition:width .2s; }
+    .ha-loader-lbl { font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.12em; color:rgba(255,255,255,.3); }
+  </style>
+  <div class="ha-loader" id="loadingScreen">
+    <img src="logo.png" alt="Hyperions" class="ha-loader-logo">
+    <div class="ha-loader-track"><div class="ha-loader-fill" id="loaderBar"></div></div>
+    <div class="ha-loader-lbl">HELPER APPLICATION</div>
+  </div>
+  <script>
+    (function(){
+      const bar=document.getElementById('loaderBar');
+      const loader=document.getElementById('loadingScreen');
+      let p=0;
+      const iv=setInterval(()=>{
+        p+=Math.random()*20+3;
+        if(p>=100){p=100;clearInterval(iv);setTimeout(()=>loader.classList.add('hidden'),400);}
+        bar.style.width=p+'%';
+      },110);
+    })();
+  </script>
+
+    <nav class="nav-container reveal">
+        <a href="/" class="nav-logo hover-target">
+            <img src="logo.png" alt="Hyperions" class="logo-icon">
+            <span>HYPERIONS</span>
+        </a>
+        <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--primary); letter-spacing: 2px;">RECRUITMENT_V4.0</div>
+    </nav>
+
+    <!-- Custom Cursors Removed -->
+
+    <main>
+
+        <section class="hero-wrapper">
+            <div class="hero-grid">
+                <div class="hero-content reveal">
+                    <span class="hero-label">Become a Helper</span>
+                    <h1 class="hero-title">Join the <span class="gradient-text">Helper Team</span> Today</h1>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
+                        <div style="padding: 1.5rem; border-radius: 20px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 0.5rem; transition: all 0.3s; cursor: default;" class="hover-target" onmouseover="this.style.borderColor='rgba(87,242,135,0.3)'; this.style.boxShadow='0 0 25px rgba(87,242,135,0.1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.boxShadow='none'">
+                            <span style="font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Current Status</span>
+                            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: #57F287; letter-spacing: -0.03em; margin: 0.2rem 0;">APPLICATIONS OPEN</div>
+                            <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.5);">Review time is the basic of the helper get accepted</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-stack reveal" style="transition-delay: 0.2s; display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div class="feature-card hover-target" style="padding: 1.5rem; border-radius: 20px; background: rgba(255, 255, 255, 0.015); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: flex-start; gap: 1.25rem; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.015)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                        <div class="feature-num" id="stepIcon01" style="width: 44px; height: 44px; flex-shrink: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1);">01</div>
+                        <div>
+                            <h4 style="margin-bottom: 0.35rem; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: #fff;">Authorize</h4>
+                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.5;">Authorize your Discord identity and open the secure application form.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card hover-target" style="padding: 1.5rem; border-radius: 20px; background: rgba(255, 255, 255, 0.015); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: flex-start; gap: 1.25rem; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.015)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                        <div class="feature-num" id="stepIcon02" style="width: 44px; height: 44px; flex-shrink: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1);">02</div>
+                        <div>
+                            <h4 style="margin-bottom: 0.35rem; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: #fff;">Select Expertise</h4>
+                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.5;">Select your strongest games and answer the tactical matching questions.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card hover-target" style="padding: 1.5rem; border-radius: 20px; background: rgba(255, 255, 255, 0.015); border: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: flex-start; gap: 1.25rem; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.015)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                        <div class="feature-num" id="stepIcon03" style="width: 44px; height: 44px; flex-shrink: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.1);">03</div>
+                        <div>
+                            <h4 style="margin-bottom: 0.35rem; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: #fff;">Upload Asset</h4>
+                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.5;">Upload squad inventory screenshots so staff can review your loadout faster.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="app-section">
+            <div class="app-box reveal" style="transition-delay: 0.4s">
+
+                <div id="loginSection" class="auth-panel">
+                    <div style="margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; background: rgba(88, 101, 242, 0.1); border-radius: 20px; display: grid; place-items: center; margin: 0 auto 1.5rem;">
+                            <svg width="40" height="40" viewBox="0 0 127.14 96.36" fill="#5865F2"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.24-16.14h0C130.46,50.45,121.49,26.79,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.09-12.73,11.41-12.73S54,46,53.89,53,48.74,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5.09-12.73,11.41-12.73S96.08,46,96,53,90.87,65.69,84.69,65.69Z"/></svg>
+                        </div>
+                        <h2 style="font-family: var(--font-display); margin-bottom: 0.5rem;">Discord Verification Required</h2>
+                        <p style="color: var(--text-dim); max-width: 400px; margin: 0 auto;">Hyperion's requires Discord verification to know who is applying to become an helper</p>
+                    </div>
+                    <a href="/api/login" class="discord-login-btn hover-target">
+                        Authorize Identity
+                    </a>
+                </div>
+
+                <div id="formSection" style="display: none;">
+                    <header class="app-header">
+                        <h2>Helper Applications</h2>
+                        <p>Complete your helper application below and one of our helper support staff will check out your application.</p>
+                    </header>
+
+                    <div class="progress-container">
+                        <div class="progress-track">
+                            <div id="progressBar" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>Protocol Completion</span>
+                            <span><span id="progressPercent">0</span>%</span>
+                        </div>
+                    </div>
+
+                    <form id="helperApplicationForm" class="form-content" novalidate>
+
+                        <div class="form-step active" id="step1">
+                            <span class="step-label">Sector 01: Identification</span>
+                            <div class="input-row form-group">
+                                <div class="input-wrapper">
+                                    <input type="text" id="discordTag" name="discordTag" required placeholder=" ">
+                                    <label>Discord Name (e.g. User#1234)</label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <input type="text" id="discordUserId" name="discordUserId" required placeholder=" ">
+                                    <label>Discord User ID</label>
+                                </div>
+                            </div>
+                            <div class="input-row form-group">
+                                <div class="custom-select-wrap" id="ageWrap">
+                                    <span class="custom-select-label-top">Select Age Group</span>
+                                    <button type="button" class="custom-select-btn" id="ageBtn">
+                                        <span id="ageLabel">Choose Age</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+                                    </button>
+                                    <div class="custom-select-dropdown" id="ageDropdown">
+                                        <div class="custom-select-option" data-value="13-15">13 - 15 Years<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="16-18">16 - 18 Years<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="19-21">19 - 21 Years<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="21+">21+ Years<div class="opt-check"></div></div>
+                                    </div>
+                                    <input type="hidden" id="age" name="age" required>
+                                </div>
+                                <div class="custom-select-wrap" id="timezoneWrap">
+                                    <span class="custom-select-label-top">Select Timezone</span>
+                                    <button type="button" class="custom-select-btn" id="timezoneBtn">
+                                        <span id="timezoneLabel">Choose Region</span>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg>
+                                    </button>
+                                    <div class="custom-select-dropdown" id="timezoneDropdown">
+                                        <div class="custom-select-option" data-value="CET">CET (Central Europe)<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="EST">EST (Eastern Time)<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="PST">PST (Pacific Time)<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="GMT">GMT (London/Greenwich)<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="AST">AST (Asian Standard)<div class="opt-check"></div></div>
+                                        <div class="custom-select-option" data-value="Other">Other Region<div class="opt-check"></div></div>
+                                    </div>
+                                    <input type="hidden" id="timezone" name="timezone" required>
+                                </div>
+                            </div>
+
+                            <span class="step-label" style="margin-top: 3rem;">Sector 02: Games And Proof</span>
+                            <div class="form-group">
+                                <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1rem;">Strongest Games</p>
+                                <div class="game-selection-grid">
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="ALS"><div class="game-item-box">ALS</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="AG"><div class="game-item-box">AG</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="AC"><div class="game-item-box">AC</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="UTD"><div class="game-item-box">UTD</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="AV"><div class="game-item-box">AV</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="BL"><div class="game-item-box">BL</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="SP"><div class="game-item-box">SP</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="ARX"><div class="game-item-box">ARX</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="ASTD"><div class="game-item-box">ASTD</div></label>
+                                    <label class="game-item hover-target"><input type="radio" name="strongestGames" value="APX"><div class="game-item-box">APX</div></label>
+                                </div>
+                            </div>
+
+                            <div id="categoryQuestions" style="margin-top: 3rem; display: none;">
+                                <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1.5rem;">Field Intelligence Data</p>
+                                <div id="categoryQuestionsList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                            </div>
+
+                            <span class="step-label" style="margin-top: 3rem;">Sector 03: Operational Logic</span>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <textarea name="availability" rows="2" required placeholder=" "></textarea>
+                                    <label>What is your availability looking like?</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <textarea name="experience" rows="3" required placeholder=" "></textarea>
+                                    <label>Your Carry Experience that you had</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <textarea name="motivation" rows="3" required placeholder=" "></textarea>
+                                    <label>Why do you want to become an helper for Hyperions?</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <input type="text" name="proofs" placeholder=" ">
+                                    <label>Additional Proofs (Links, Vouches)</label>
+                                </div>
+                            </div>
+
+                            <span class="step-label" style="margin-top: 3rem;">Sector 04: Assets And Submission</span>
+                            <div class="form-group">
+                                <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1rem;">Asset Upload (Inventory)</p>
+                                <div class="upload-zone hover-target" id="uploadZone">
+                                    <input type="file" id="inventoryScreenshots" name="inventoryScreenshots" multiple accept="image/*,video/*" style="display: none;">
+                                    <div class="upload-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    </div>
+                                    <p style="font-weight: 700; font-size: 0.9rem;">Initiate Data Upload</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-dim);">Max 4 high-resolution captures (PNG/JPG)</p>
+                                </div>
+                                <div id="screenshotPreview" class="game-selection-grid" style="margin-top: 1rem;"></div>
+                            </div>
+
+                            <div class="confirmation-section">
+                                <label class="confirmation-label hover-target">
+                                    <input type="checkbox" name="termsAccepted" id="termsAccepted" required>
+                                    <div class="custom-checkbox">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </div>
+                                    <span class="confirmation-text">I confirm that all information provided in this application is accurate and was completed to the best of my knowledge.</span>
+                                </label>
+                            </div>
+
+                            <div style="margin-top: 3rem;">
+                                <button type="submit" id="submitButton" class="discord-login-btn hover-target" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px;">
+                                    <span class="btn-text">Complete Application</span>
+                                </button>
+                                <p id="formStatus" style="text-align: center; margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.75rem;"></p>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </section>
+    <footer class="ultra-footer" style="padding: 4rem 2rem; border-top: 1px solid var(--border-glass);">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; color: var(--text-dim); font-size: 0.8rem;">
+            <span>&copy; 2026 Hyperions Network. Become a Helper.</span>
+            <div style="display: flex; gap: 2rem;">
+                <a href="/terms.html" style="color: inherit; text-decoration: none;">Terms</a>
+                <a href="/privacy.html" style="color: inherit; text-decoration: none;">Privacy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="helper-application.js?v=fresh_emojis_v13"></script>
+    <script src="modmail-widget.js?v=fresh_emojis_v13"></script>
+    <script>
+        // Init Tilt
+        VanillaTilt.init(document.querySelectorAll(".feature-card"), {
+            max: 5,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.1,
+        });
+    </script>
+</body>
+</html>

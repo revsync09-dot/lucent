@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyperions — Main Website</title>
+  <meta name="description" content=" Helper application portal for Hyperions.">
+  <meta property="og:title" content="Hyperions — Main Website">
+  <meta property="og:description" content= "Helper application portal for Hyperions.">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css?v=hyperions_pro_v5">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    /* ── DESIGN TOKENS ───────────────────────────────────── */
+    :root {
+      --c0: #000000;
+      --c1: #0a0a0f;
+      --c2: #111118;
+      --c3: #1a1a26;
+      --accent: #7c6fff;
+      --accent2: #a78bfa;
+      --accent3: #c4b5fd;
+      --green: #34d399;
+      --gold: #fbbf24;
+      --red: #f87171;
+      --white: #ffffff;
+      --dim: rgba(255,255,255,0.45);
+      --dimmer: rgba(255,255,255,0.18);
+      --border: rgba(255,255,255,0.07);
+      --border-accent: rgba(124,111,255,0.3);
+      --glass: rgba(255,255,255,0.03);
+      --glass-heavy: rgba(255,255,255,0.06);
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease: cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ── RESET ───────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+    body { background: var(--c0); color: var(--white); font-family: var(--font-sans); overflow-x: hidden; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; }
+
+    /* ── BACKGROUND CANVAS ───────────────────────────────── */
+    .bg-canvas {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    }
+    .bg-canvas::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(124,111,255,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 50% at 50% 50%, rgba(0,0,0,1) 30%, transparent 80%);
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 0%, transparent 100%);
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+    }
+
+    /* ── PREMIUM CURSOR SYSTEM ──────────────────────────────── */
+    .cursor-follower { position: fixed; width: 400px; height: 400px; background: radial-gradient(circle, rgba(124, 111, 255, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: -5; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; will-change: transform; }
+    .dot-cursor { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); transition: transform 0.08s ease-out; box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+    .dot-cursor-outer { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px solid rgba(124, 111, 255, 0.4); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), width 0.3s, height 0.3s, border-color 0.3s, background 0.3s; will-change: transform; }
+    .dot-cursor-outer.hovering { width: 65px; height: 65px; background: rgba(124, 111, 255, 0.1); border-color: rgba(124, 111, 255, 0.8); }
+
+    @media (pointer: coarse), (hover: none) {
+      .cursor-follower, .dot-cursor, .dot-cursor-outer { display: none !important; }
+    }
+
+    body, a, button, input, textarea, select {
+      cursor: none !important;
+    }
+
+    select {
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: #fff; padding: 0.5rem 2rem 0.5rem 1rem; border-radius: 50px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.8rem center;
+    }
+
+
+    /* ── LOADER ──────────────────────────────────────────── */
+    .loader {
+      position: fixed; inset: 0; z-index: 9000;
+      background: var(--c0); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2rem;
+      transition: opacity 0.6s var(--ease), visibility 0.6s;
+    }
+    .loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-logo { width: 72px; height: 72px; border-radius: 20px; animation: pulse-logo 2s ease-in-out infinite; }
+    @keyframes pulse-logo { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.7;transform:scale(0.97);} }
+    .loader-track { width: 200px; height: 2px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .loader-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.2s; }
+    .loader-label { font-size: 0.8rem; letter-spacing: 0.15em; color: var(--dimmer); font-weight: 500; }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid transparent;
+      transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+    }
+    .nav.scrolled {
+      background: rgba(0,0,0,0.8);
+      -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+      border-color: var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.75rem; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+    .nav-logo img { width: 36px; height: 36px; border-radius: 10px; }
+    .nav-links { display: flex; gap: 0.25rem; }
+    .nav-link { padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.875rem; font-weight: 500; color: var(--dim); transition: all 0.2s; }
+    .nav-link:hover { color: var(--white); background: var(--glass-heavy); }
+    .nav-cta {
+      padding: 0.6rem 1.4rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600;
+      background: var(--accent); color: #fff;
+      white-space: nowrap;
+      box-shadow: 0 0 20px rgba(124,111,255,0.4);
+      transition: all 0.25s var(--ease);
+    }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(124,111,255,0.6); }
+
+    @media (max-width: 600px) {
+      .nav { padding: 1rem 1.25rem; }
+      .nav-logo span { display: none; }
+      .nav-cta { padding: 0.5rem 1rem; font-size: 0.75rem; }
+    }
+
+    /* ── HERO ────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 8rem 2rem 6rem;
+      position: relative;
+    }
+    .hero-inner { max-width: 900px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.45rem 1.1rem; border-radius: 99px;
+      border: 1px solid var(--border-accent);
+      background: rgba(124,111,255,0.08);
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; color: var(--accent3);
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s var(--ease) both;
+    }
+    .hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .hero-title {
+      font-family: var(--font-display); font-size: clamp(3rem, 10vw, 6rem); font-weight: 900;
+      line-height: 0.85; letter-spacing: -0.06em;
+      text-transform: lowercase;
+      animation: fadeUp 0.8s 0.1s var(--ease) both;
+    }
+    .hero-title .line1 { display: block; }
+    .hero-title .grad {
+      display: block;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      margin-top: 1.5rem; font-size: 1.1rem; color: rgba(255,255,255,0.4); max-width: 580px; margin-inline: auto;
+      font-weight: 500;
+      animation: fadeUp 0.8s 0.2s var(--ease) both;
+    }
+    .hero-actions {
+      margin-top: 2.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s var(--ease) both;
+    }
+    .btn-primary {
+      padding: 0.85rem 2rem; border-radius: 14px; font-size: 0.95rem; font-weight: 700;
+      background: var(--accent); color: #fff;
+      box-shadow: 0 0 30px rgba(124,111,255,0.45), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: all 0.25s var(--ease);
+    }
+    .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 50px rgba(124,111,255,0.65); }
+    .btn-secondary {
+      padding: 0.85rem 2rem; border-radius: 14px; font-size: 0.95rem; font-weight: 600;
+      border: 1px solid var(--border); color: var(--dim); background: var(--glass);
+      transition: all 0.25s var(--ease);
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--white); background: var(--glass-heavy); }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.72rem; letter-spacing: 0.1em; color: var(--dimmer); animation: fadeUp 1s 0.5s var(--ease) both;
+    }
+    .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollLine 2s ease-in-out infinite; }
+    @keyframes scrollLine { 0%,100%{opacity:0.3;transform:scaleY(0.6);} 50%{opacity:1;transform:scaleY(1);} }
+
+    /* ── STATS STRIP ─────────────────────────────────────── */
+    .stats-strip {
+      padding: 0 2rem; max-width: 1200px; margin: 0 auto 6rem;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border); border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .stat-cell {
+      background: var(--c1); padding: 2rem 1.5rem;
+      display: flex; align-items: center; gap: 1.25rem;
+      transition: background 0.25s;
+    }
+    .stat-cell:hover { background: var(--c2); }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+      background: rgba(124,111,255,0.12); border: 1px solid var(--border-accent);
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .stat-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dimmer); margin-bottom: 0.3rem; }
+    .stat-value { font-family: var(--font-display); font-size: 1.75rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .stat-unit { font-size: 1rem; color: var(--dim); }
+
+    /* ── SECTION SHARED ──────────────────────────────────── */
+    .section { padding: 7rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;
+    }
+    .section-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+    .section-sub { margin-top: 0.75rem; font-size: 1rem; color: var(--dim); max-width: 520px; line-height: 1.7; }
+    .section-head { margin-bottom: 3.5rem; }
+
+    /* reveal animation */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.active { opacity: 1 !important; transform: none !important; }
+
+    /* ── BOT STATUS SECTION ──────────────────────────────── */
+    #dashboard .status-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    .status-card {
+      background: var(--c1); border: 1px solid var(--border);
+      border-radius: 24px; padding: 2rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: border-color 0.25s, transform 0.25s var(--ease);
+    }
+    .status-card:hover { border-color: var(--border-accent); transform: translateY(-3px); }
+    .status-card.wide { grid-column: 1 / -1; }
+    
+    /* uptime bar */
+    .uptime-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .uptime-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+    .uptime-pct { font-family: var(--font-mono); font-size: 0.85rem; color: var(--green); font-variant-numeric: tabular-nums; }
+    .uptime-bar { display: flex; gap: 3px; height: 36px; align-items: stretch; border-radius: 10px; overflow: hidden; }
+    .uptime-bar-seg { flex: 1; border-radius: 2px; background: var(--green); opacity: 0.9; transition: opacity 0.2s; }
+    .uptime-bar-seg:hover { opacity: 1; }
+    .uptime-bar-seg.down { background: var(--red); opacity: 0.5; }
+
+    /* service list */
+    .service-row { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+    .service-row:last-child { border-bottom: none; }
+    .service-name { font-size: 0.9rem; font-weight: 500; color: var(--dim); }
+    .service-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .service-status { font-size: 0.8rem; font-family: var(--font-mono); color: var(--green); display: flex; align-items: center; gap: 0.5rem; }
+
+    /* big metric inside card */
+    .card-metric-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .card-metric-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dimmer); margin-bottom: 0.35rem; }
+    .card-metric-value { font-family: var(--font-display); font-size: 2.75rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .card-metric-sub { font-size: 0.8rem; color: var(--dimmer); margin-top: 0.35rem; }
+
+    /* ── VERSION BADGE ───────────────────────────────────── */
+    .version-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.9rem; border-radius: 99px;
+      background: rgba(124,111,255,0.12); border: 1px solid var(--border-accent);
+      font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent3);
+    }
+
+    /* ── STAFF GRID ──────────────────────────────────────── */
+    .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+    .staff-card {
+      background: linear-gradient(145deg, var(--c1), var(--c2)); border: 1px solid var(--border); border-radius: 28px;
+      padding: 2.5rem 1.5rem; text-align: center;
+      transition: all 0.4s var(--ease);
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .staff-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top right, rgba(124,111,255,0.08), transparent 70%);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .staff-card:hover {
+      border-color: var(--border-accent); transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,111,255,0.2);
+    }
+    .staff-card:hover::before { opacity: 1; }
+
+    .staff-avatar-wrap { position: relative; width: 90px; height: 90px; margin: 0 auto 1.5rem; }
+    .staff-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--c1); box-shadow: 0 0 20px rgba(0,0,0,0.4); transition: transform 0.4s var(--ease); }
+    .staff-card:hover .staff-avatar { transform: scale(1.05) rotate(3deg); border-color: var(--accent); }
+    
+    .staff-online { 
+      position: absolute; bottom: 5px; right: 5px; width: 16px; height: 16px; border-radius: 50%; 
+      background: var(--green); border: 3px solid var(--c1); 
+      box-shadow: 0 0 12px var(--green);
+    }
+    .staff-name { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
+    .staff-role { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent3); margin-bottom: 1.25rem; }
+    .staff-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+    .staff-tag { 
+      font-size: 0.65rem; padding: 0.3rem 0.75rem; border-radius: 8px; 
+      background: var(--glass); border: 1px solid var(--border); 
+      color: var(--dim); font-weight: 600; text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .staff-card:hover .staff-tag { border-color: var(--border-accent); color: var(--white); background: rgba(124,111,255,0.1); }
+
+    /* ── RULES SECTION ───────────────────────────────────── */
+    .rules-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .rule-card {
+      background: var(--c1); border: 1px solid var(--border); border-radius: 24px;
+      padding: 2rem; transition: border-color 0.25s;
+    }
+    .rule-card:hover { border-color: var(--border-accent); }
+    .rule-card-title {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem;
+      color: var(--white);
+    }
+    .rule-card-icon { font-size: 1.3rem; }
+    .rule-list { display: flex; flex-direction: column; gap: 1rem; }
+    .rule-item { display: flex; gap: 0.85rem; align-items: flex-start; }
+    .rule-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 0.55rem; }
+    .rule-text { font-size: 0.875rem; color: var(--dim); line-height: 1.6; }
+    .rule-text strong { color: var(--white); font-weight: 600; }
+
+    .quota-mini { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; }
+    .quota-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.85rem; background: var(--glass); border-radius: 10px; border: 1px solid var(--border); }
+    .quota-game { font-size: 0.8rem; font-weight: 600; color: var(--accent2); }
+    .quota-req { font-size: 0.78rem; color: var(--dim); font-family: var(--font-mono); }
+
+    /* ── UPDATES TIMELINE ────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+    .timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+    .timeline-item { display: flex; gap: 1.5rem; padding: 1.5rem 0; position: relative; }
+    .timeline-dot { width: 33px; height: 33px; border-radius: 50%; background: var(--c2); border: 2px solid var(--border-accent); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: var(--accent3); z-index: 1; }
+    .timeline-dot.latest { background: rgba(124,111,255,0.2); border-color: var(--accent); box-shadow: 0 0 16px rgba(124,111,255,0.3); color: var(--accent); }
+    .timeline-content { padding-top: 0.3rem; flex: 1; }
+    .timeline-version { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); margin-bottom: 0.3rem; }
+    .timeline-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .timeline-body { font-size: 0.875rem; color: var(--dim); line-height: 1.7; }
+    .timeline-body li { margin-left: 1.2rem; margin-top: 0.35rem; }
+
+    /* ── STEPS (HOW IT WORKS) ────────────────────────────── */
+    .steps-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .step-card {
+      background: var(--c1); border: 1px solid var(--border); border-radius: 24px;
+      padding: 2rem; position: relative; overflow: hidden;
+      transition: border-color 0.25s, transform 0.3s var(--ease);
+    }
+    .step-card:hover { border-color: var(--border-accent); transform: translateY(-4px); }
+    .step-num {
+      font-family: var(--font-display); font-size: 5rem; font-weight: 900; line-height: 1;
+      position: absolute; right: 1.25rem; top: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), transparent);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      opacity: 0.35; pointer-events: none;
+    }
+    .step-icon-wrap { width: 52px; height: 52px; border-radius: 16px; background: rgba(124,111,255,0.1); border: 1px solid var(--border-accent); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; }
+    .step-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .step-body { font-size: 0.875rem; color: var(--dim); line-height: 1.6; }
+
+    /* ── CTA SECTION ─────────────────────────────────────── */
+    .cta-section {
+      padding: 6rem 2rem; text-align: center;
+      background: linear-gradient(to bottom, transparent, rgba(124,111,255,0.05), transparent);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .cta-inner { max-width: 700px; margin: 0 auto; }
+    .cta-title { font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 1.25rem; }
+    .cta-sub { font-size: 1.05rem; color: var(--dim); margin-bottom: 2.5rem; line-height: 1.7; }
+    .cta-grad { background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      padding: 4rem 2rem 2rem; max-width: 1200px; margin: 0 auto;
+    }
+    .footer-top { display: flex; justify-content: space-between; gap: 3rem; padding-bottom: 3rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .footer-brand h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.75rem; }
+    .footer-brand p { font-size: 0.875rem; color: var(--dim); max-width: 300px; line-height: 1.7; }
+    .footer-col h4 { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dimmer); margin-bottom: 1rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    .footer-col a { font-size: 0.875rem; color: var(--dim); transition: color 0.2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .footer-copy { font-size: 0.8rem; color: var(--dimmer); }
+    .footer-refresh { font-size: 0.78rem; font-family: var(--font-mono); color: var(--dimmer); }
+
+    /* ── TRADE FEED ──────────────────────────────────────── */
+    .trade-feed-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; width: 100%; max-width: 1200px; margin: 0 auto; }
+    .trade-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 24px; padding: 1.5rem; transition: transform 0.3s, border-color 0.3s; position: relative; overflow: hidden; text-align: left; }
+    .trade-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .trade-card-badge { position: absolute; top: 1rem; right: 1rem; background: var(--accent); color: var(--white); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+    .trade-card-verify { display: inline-flex; align-items: center; gap: 4px; color: #00ffa3; font-size: 0.75rem; margin-top: 4px; }
+    .trade-user { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .trade-avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); }
+    .trade-name { font-weight: 700; color: var(--white); font-size: 1rem; }
+    .trade-info { display: flex; flex-direction: column; gap: 1rem; }
+    .trade-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .trade-label { font-size: 0.65rem; color: var(--dimmer); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .trade-value { font-size: 0.9rem; color: var(--dim); line-height: 1.4; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+    .trade-footer { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .trade-trust { font-size: 0.75rem; font-weight: 600; color: var(--accent); }
+    .trade-time { font-size: 0.65rem; color: var(--dimmer); font-family: var(--font-mono); }
+
+    /* ── ANIMATIONS ──────────────────────────────────────── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:none;} }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      #dashboard .status-layout { grid-template-columns: 1fr; }
+      .rules-grid { grid-template-columns: 1fr; }
+      .steps-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .footer-top { flex-direction: column; }
+    }
+      .uptime-bar { display: flex; gap: 5px; height: 60px; align-items: stretch; border-radius: 12px; overflow: visible; }
+      .status-card.no-bg { background:transparent; border:none; padding:0; }
+      .availability-head { margin-bottom: 2rem; text-align: left; }
+      .avail-title { font-family:var(--font-display); font-size:1.5rem; font-weight:700; }
+      .presence-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:1.25rem; }
+      .monitoring-section { padding-top: 2rem; }
+      
+      @media (max-width: 480px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .staff-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+</head>
+<body>
+
+  <div class="bg-canvas"></div>
+  <div class="bg-grid"></div>
+  <div class="noise"></div>
+
+
+  <div class="dot-cursor" id="dotCursor"></div>
+  <div class="dot-cursor-outer" id="dotCursorOuter"></div>
+  <div class="cursor-follower" id="cursorFollower"></div>
+
+  <div class="loader" id="loadingScreen">
+    <img src="logo.png" alt="Hyperions" class="loader-logo">
+    <div class="loader-track">
+      <div class="loader-fill" id="loaderBar"></div>
+    </div>
+    <div class="loader-label" style="font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.1em; color:rgba(255,255,255,0.3);">HYPERIONS LOADING</div>
+  </div>
+
+  <header class="nav" id="mainNav">
+    <a href="/" class="nav-logo">
+      <img src="logo.png" alt="Hyperions Logo">
+      <span>Hyperions</span>
+    </a>
+    <nav class="nav-links" role="navigation">
+      <a href="#dashboard" class="nav-link">Dashboard</a>
+      <a href="/helpers" class="nav-link">Helpers</a>
+      <a href="/messages" class="nav-link">Analytics</a>
+        <a href="/trade-hub" class="nav-link">Trade Coming Soon</a>
+      <a href="#rules" class="nav-link">Rules</a>
+      <a href="#updates" class="nav-link">Updates</a>
+    </nav>
+    <div class="nav-right" style="display:flex; align-items:center; gap:1rem;">
+      <a href="/helper-application" class="nav-cta">Become a Helper</a>
+      <button class="mobile-menu-toggle" id="menuToggleMain">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero" id="home">
+      <div class="hero-inner">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          <span>Hyperions Server only for you</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="line1">Hyperions</span>
+          <span class="grad">Bot Status</span>
+        </h1>
+        <p class="hero-sub">
+          You can check here if the bot is online or offline, how many tickets are open, how many vouches the bot has, and how many messages have been sent in the server, Apply to become a helper, and check the rules of the server.
+        </p>
+        <div class="hero-actions">
+          <a href="#dashboard" class="btn-primary" id="heroBtnStatus">View Dashboard</a>
+          <a href="/helpers" class="btn-secondary">Meet the Helpers</a>
+        </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="hero-scroll-line"></div>
+        SCROLL
+      </div>
+    </section>
+
+    <div class="stats-strip" id="dashboard">
+      <div class="stats-grid reveal">
+
+        <div class="stat-cell">
+          <div class="stat-icon" id="metricIconUptime">📡</div>
+          <div class="stat-info">
+            <div class="stat-label">Uptime</div>
+            <div class="stat-value" id="uptimeVal">--</div>
+          </div>
+        </div>
+
+        <div class="stat-cell">
+          <div class="stat-icon" id="metricIconPing">⚡</div>
+          <div class="stat-info">
+            <div class="stat-label">Latency</div>
+            <div class="stat-value"><span id="pingVal">0</span><span class="stat-unit">ms</span></div>
+          </div>
+        </div>
+
+        <div class="stat-cell">
+          <div class="stat-icon" id="metricIconTickets">🎟️</div>
+          <div class="stat-info">
+            <div class="stat-label">Open Tickets</div>
+            <div class="stat-value" id="ticketsVal">0</div>
+          </div>
+        </div>
+
+        <div class="stat-cell">
+          <div class="stat-icon" id="metricIconVouches">⭐</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Vouches</div>
+            <div class="stat-value" id="vouchesVal">0</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <section class="section monitoring-section">
+      <div class="section-head reveal">
+        <span class="section-label">Monitoring</span>
+        <h2 class="section-title">Status of the Hyperions Bot</h2>
+        <p class="section-sub">Live operational data refreshed every 30 seconds from our infrastructure nodes.</p>
+      </div>
+
+      <div class="status-layout reveal" id="statusLayout">
+
+        <div class="status-card wide">
+          <div class="uptime-header">
+            <span class="uptime-label">24-Hour Uptime History</span>
+            <span class="uptime-pct" id="uptimePct">100.00%</span>
+          </div>
+          <div class="uptime-bar" id="uptimeBar"></div>
+        </div>
+
+        <div class="status-card wide no-bg">
+           <div class="section-head availability-head">
+               <span class="section-label">Game Network</span>
+               <h3 class="avail-title">Live Support Coverage</h3>
+               <p class="section-sub">Clean live coverage for every supported game with custom service emojis, helper counts and current network state.</p>
+           </div>
+           <div id="presenceGrid" class="presence-grid">
+              <!-- Presence injected via JS -->
+           </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="leaderboard">
+       <div class="section-head reveal">
+          <span class="section-label">Expertise</span>
+          <h2 class="section-title">Top Rated Helpers</h2>
+          <p class="section-sub">The most Active and Trusted Helpers in Hyperions.</p>
+       </div>
+       <div id="helpersGrid" class="staff-grid reveal">
+          <!-- Helpers injected via JS -->
+       </div>
+    </section>
+
+    <!-- Trading Section Removed - Moved to /trade-hub -->
+
+    <section class="section" id="staff">
+      <div class="section-head reveal">
+        <span class="section-label">Leadership</span>
+        <h2 class="section-title">Meet the Team</h2>
+        <p class="section-sub">The elite professionals behind the Hyperions ecosystem.</p>
+      </div>
+      <div class="staff-grid" id="staffGrid">
+         <!-- Staff members injected via JS from status.js -->
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head reveal">
+        <span class="section-label">How It Works</span>
+        <h2 class="section-title">Getting Carried in 3 Steps</h2>
+      </div>
+      <div class="steps-row">
+        <div class="step-card reveal">
+          <div class="step-num">1</div>
+          <div class="step-icon-wrap"><span id="stepIcon01">🎟️</span></div>
+          <div class="step-title">Open a Ticket</div>
+          <div class="step-body">Head to our Discord server, pick your game from the carry panel and submit your carry request. Your ticket channel opens instantly.</div>
+        </div>
+        <div class="step-card reveal" style="transition-delay:.1s;">
+          <div class="step-num">2</div>
+          <div class="step-icon-wrap"><span id="stepIcon02">🤝</span></div>
+          <div class="step-title">Get Matched</div>
+          <div class="step-body">A qualified Helper for your game claims your ticket and joins your session. 15-minute response window guaranteed.</div>
+        </div>
+        <div class="step-card reveal" style="transition-delay:.2s;">
+          <div class="step-num">3</div>
+          <div class="step-icon-wrap"><span id="stepIcon03">⭐</span></div>
+          <div class="step-title">Vouch & Complete</div>
+          <div class="step-body">After your carry is complete, leave a vouch to rate your Helper and help track their performance on the leaderboard.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="rules">
+      <div class="section-head reveal">
+        <span class="section-label">Regulations</span>
+        <h2 class="section-title">Helper Rules &amp; Guidelines</h2>
+        <p class="section-sub">All Helpers are expected to follow these rules to maintain quality service.</p>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rule-card reveal">
+          <div class="rule-card-title"><span id="headerIconRules" class="rule-card-icon">📜</span> Standard Rules</div>
+          <div class="rule-list">
+            <div class="rule-item">
+              <div class="rule-dot"></div>
+              <p class="rule-text"><strong>Priority:</strong> Handle tickets in chronological order. 15-minute response window before skip.</p>
+            </div>
+            <div class="rule-item">
+              <div class="rule-dot"></div>
+              <p class="rule-text"><strong>Integrity:</strong> Only claim missions you intend to complete. Avoid cross-trading or payment requests.</p>
+            </div>
+            <div class="rule-item">
+              <div class="rule-dot"></div>
+              <p class="rule-text"><strong>Handover:</strong> If unable to continue, unclaim immediately and notify the Helper channel.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          <div class="rule-card reveal" style="transition-delay:.1s;">
+            <div class="rule-card-title"><span id="headerIconPayment" class="rule-card-icon">💳</span> Payment</div>
+            <p class="rule-text">Follow carry-information strictly. Voluntary tips are allowed — asking for payment is a demotion-worthy offence.</p>
+          </div>
+          <div class="rule-card reveal" style="transition-delay:.2s;">
+            <div class="rule-card-title"><span id="headerIconInfo" class="rule-card-icon">ℹ️</span> Extra Info</div>
+            <p class="rule-text">Always maintain professionalism in ticket channels. For quota questions, check <span id="headerIconQuota"></span> quota-info.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="updates">
+      <div class="section-head reveal">
+        <span class="section-label">Logbook</span>
+        <h2 class="section-title">Hyperions Bot Updates</h2>
+      </div>
+
+      <div class="timeline reveal">
+        <div class="timeline-item">
+          <div class="timeline-dot latest">★</div>
+          <div class="timeline-content">
+            <div class="timeline-version">v3.5.0 — Latest</div>
+            <div class="timeline-title">The "Visual Overhaul" Update</div>
+            <div class="timeline-body">
+              <ul>
+                <li><strong>Team Design:</strong> Redesigned the Staff section from scratch. It looks way more premium and "krank" now with new glow effects and animations.</li>
+                <li><strong>Pro Cursor:</strong> Brought back the custom cursor, but better. It's super smooth and reacts when you hover over stuff.</li>
+                <li><strong>Uptime Tracking:</strong> Upgraded the Uptime History to show the last 24 hours in detail with glowing status bars.</li>
+                <li><strong>Stability:</strong> Cleared out a bunch of technical clutter to make the dashboard load faster and feel more professional.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">4</div>
+          <div class="timeline-content">
+            <div class="timeline-version">v3.4.0</div>
+            <div class="timeline-title">The "Hyperions Experience" Upgrade</div>
+            <div class="timeline-body">
+              <ul>
+                <li><strong>Homepage:</strong> A fresh look for the main page to make it cleaner.</li>
+                <li><strong>Ticket Sync:</strong> Fixed the counter so it actually matches what's happening on Discord.</li>
+                <li><strong>Roblox Avatars:</strong> Helper avatars now use the public API, so they consistently show up everywhere.</li>
+                <li><strong>Reminders:</strong> Improved the automated reminder messages for tickets.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-content">
+            <div class="timeline-version">v3.3.0</div>
+            <div class="timeline-title">Live Modmail & Status Page</div>
+            <div class="timeline-body">
+              <ul>
+                <li><strong>Premium Loading Screen:</strong> Added a high-end, animated entrance experience.</li>
+                <li><strong>Live Modmail Support:</strong> Fully integrated into the status page widget.</li>
+                <li><strong>Discord Media Sync:</strong> Images sent in Discord correctly render in the website chat.</li>
+                <li><strong>System Stability:</strong> Optimised the bot startup sequence.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-content">
+            <div class="timeline-version">v3.2.0</div>
+            <div class="timeline-title">Helper Application Redesign</div>
+            <div class="timeline-body">The <strong>Helper Application</strong> website has been fully redesigned with a professional experience.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-section">
+      <div class="cta-inner reveal">
+        <h2 class="cta-title">Join our<br><span class="cta-grad">Elite Helper Team</span></h2>
+        <p class="cta-sub">Do you have what it takes? Apply to become an official Hyperions Helper and start helping our community level up.</p>
+        <a href="/helper-application" class="btn-primary" style="font-size:1rem;padding:1rem 2.5rem;">Apply Now →</a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer-wrap reveal">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <div class="footer-brand-logo">
+          <img src="logo.png" alt="Hyperions Logo" style="width: 40px; height: 40px; border-radius: 10px; margin-bottom: 1rem;">
+          <h2 class="footer-brand-text">HYPERIONS</h2>
+        </div>
+        <p class="footer-copy">The premier ecosystem for high-tier game carries and community excellence. Built for the elite, by the elite.</p>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Ecosystem</h4>
+        <ul class="footer-links">
+            <li><a href="/trade-hub">Trade Coming Soon</a></li>
+          <li><a href="#dashboard">Live Status</a></li>
+          <li><a href="/helper-application">Apply Now</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="/terms.html">Terms</a></li>
+          <li><a href="/privacy.html">Privacy</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h4>Social</h4>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link" title="Discord">💬</a>
+          <a href="#" class="footer-social-link" title="Twitter">𝕏</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Hyperions Network. All signals operational.</span>
+      <span class="footer-refresh">Refreshed <span id="lastRefreshSecondary">--:--</span></span>
+    </div>
+  </footer>
+
+  <script>
+    // ── Unified Logic Block ──────────────────────────────────
+    
+    // 1. Loader Logic
+    (function() {
+      const loader = document.getElementById('loadingScreen');
+      const bar    = document.getElementById('loaderBar');
+      let prog = 0;
+      const iv = setInterval(() => {
+        prog += Math.random() * 25;
+        if (prog >= 100) {
+          prog = 100; clearInterval(iv);
+          setTimeout(() => {
+            loader.classList.add('hidden');
+            if (window.initializeReveal) window.initializeReveal();
+          }, 500);
+        }
+        if (bar) bar.style.width = prog + '%';
+      }, 100);
+    })();
+
+    // 2. Navigation & Mobile Menu
+    (function() {
+      const nav = document.getElementById('mainNav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+      });
+
+      const menuToggle = document.getElementById('menuToggleMain');
+      const navLinks = document.querySelector('.nav-links');
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+          menuToggle.classList.toggle('active');
+          navLinks.classList.toggle('active');
+          document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
+      }
+    })();
+
+    // 4. GSAP & Reveal Logic
+    function initializeReveal() {
+      const reveals = document.querySelectorAll('.reveal');
+      reveals.forEach(r => r.classList.add('active')); // Force active on dashboard
+      
+      if (typeof gsap !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.to('.hero-inner > *', { y: 0, opacity: 1, duration: 1.2, stagger: 0.15, ease: "power4.out" });
+      }
+    }
+    window.initializeReveal = initializeReveal;
+    initializeReveal();
+
+    window.addEventListener('load', () => {
+      initializeReveal();
+    });
+
+    // Also run immediately if load already happened
+    if (document.readyState === 'complete') {
+        initializeReveal();
+    }
+
+    // 5. Cursor System (Native Move)
+    if (window.matchMedia("(pointer: fine)").matches) {
+       const dot = document.getElementById('dotCursor');
+       const outer = document.getElementById('dotCursorOuter');
+       const follower = document.getElementById('cursorFollower');
+       
+       document.addEventListener('mousemove', (e) => {
+         const { clientX: x, clientY: y } = e;
+         if (dot) dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+         if (outer) outer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+         if (follower) follower.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+       });
+       
+       document.querySelectorAll('a, button, select, .trade-card, .staff-card').forEach(el => {
+         el.addEventListener('mouseenter', () => outer && outer.classList.add('hovering'));
+         el.addEventListener('mouseleave', () => outer && outer.classList.remove('hovering'));
+       });
+    }
+  </script>
+
+  <script src="status.js?v=hyperions_pro_v5"></script>
+  <script src="modmail-widget.js?v=hyperions_pro_v5"></script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "Hyperions-Bot",
+  "services": [
+    {
+      "name": "bot-worker",
+      "type": "deployment",
+      "dockerfile": "Dockerfile",
+      "buildContext": ".",
+      "compute": {
+        "plan": "nf-compute-free-1"
+      },
+      "ports": [
+        {
+          "name": "status-web",
+          "internalPort": 3000,
+          "protocol": "HTTP"
+        }
+      ],
+      "env": {
+        "STATUS_PORT": "3000"
+      }
+    }
+  ]
+}

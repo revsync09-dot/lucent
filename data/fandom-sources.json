@@ -1,0 +1,182 @@
+{
+  "ALS": {
+    "wiki": "https://alsroblox.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Portals", "Category:Relics", "Category:Units", "Category:Materials", "Category:Traits"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://alsroblox.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      }
+    ]
+  },
+  "AG": {
+    "wiki": "https://animeguardians.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Units", "Category:Materials", "Category:Traits", "Category:Relics"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animeguardians.fandom.com",
+        "page": "Units",
+        "itemType": "unit"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animeguardians.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animeguardians.fandom.com",
+        "page": "Traits",
+        "itemType": "trait"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animeguardians.fandom.com",
+        "page": "Relics",
+        "itemType": "relic"
+      }
+    ]
+  },
+  "AC": {
+    "wiki": "https://animecrusaders.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Units", "Category:Materials", "Category:Traits", "Category:Portals"],
+    "extraSources": [
+      {
+        "type": "wordpress-items-tabs",
+        "baseUrl": "https://animecrusaders.wiki",
+        "slug": "items"
+      },
+      {
+        "type": "wordpress-units-grid",
+        "baseUrl": "https://animecrusaders.wiki",
+        "slug": "units-3"
+      }
+    ]
+  },
+  "UTD": {
+    "wiki": "https://universaltd.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Units", "Category:Materials", "Category:Traits", "Category:Consumables", "Category:Portals"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://universaltd.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://universaltd.fandom.com",
+        "page": "Unit_List",
+        "itemType": "unit"
+      }
+    ]
+  },
+  "AV": {
+    "wiki": "https://animevanguards.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Portals", "Category:Traits", "Category:Units", "Category:Materials", "Category:Relics"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animevanguards.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      }
+    ]
+  },
+  "SP": {
+    "wiki": "https://sailor-piece.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Accessories", "Category:Weapons", "Category:Fruits", "Category:Materials"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://sailor-piece.fandom.com",
+        "page": "Fruits",
+        "itemType": "fruit"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://sailor-piece.fandom.com",
+        "page": "Weapons",
+        "itemType": "weapon"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://sailor-piece.fandom.com",
+        "page": "Accessories",
+        "itemType": "accessory"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://sailor-piece.fandom.com",
+        "page": "Materials",
+        "itemType": "material"
+      }
+    ]
+  },
+  "ARX": {
+    "wiki": "https://animerangersx.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Units", "Category:Materials", "Category:Traits", "Category:Relics"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animerangersx.fandom.com",
+        "page": "Rangers",
+        "itemType": "unit"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animerangersx.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animerangersx.fandom.com",
+        "page": "Traits",
+        "itemType": "trait"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animerangersx.fandom.com",
+        "page": "Relics",
+        "itemType": "relic"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://animerangersx.fandom.com",
+        "page": "Materials",
+        "itemType": "material"
+      }
+    ]
+  },
+  "ASTD": {
+    "wiki": "https://allstartd.fandom.com",
+    "mode": "categories",
+    "categories": ["Category:Items", "Category:Units", "Category:Orbs", "Category:Materials", "Category:Traits"],
+    "extraSources": [
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://allstartd.fandom.com",
+        "page": "Items",
+        "itemType": "item"
+      },
+      {
+        "type": "fandom-parse-page",
+        "baseUrl": "https://allstartd.fandom.com",
+        "page": "Units",
+        "itemType": "unit"
+      }
+    ]
+  }
+}

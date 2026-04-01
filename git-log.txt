@@ -1,0 +1,64 @@
+﻿612608d feat(web): fix application UI layout, enhance progress bars to glowing style, remove support elements, and update branding to Hypernarios
+e097e6c feat(web): sync ultra-premium UI template with bot backend
+84f66d4 feat(web): overhaul UI to ultra-premium futuristic SaaS design
+c2b286a feat(api): premium dossier with custom emojis and bot-button priority
+623db2b feat(api/bot): world-class helper dossier & auto-role assignment for games
+2116012 fix(api): clean rewrite with webhook as primary delivery
+bb597ca debug(api): expose discord errors to client for troubleshooting
+f97cbe3 fix(api): ensure mandatory authentication and robust discord delivery
+328663b fix(api): fix callback syntax error and redirect 404
+e419ecc fix(auth): hardcode redirect URI to match discord portal settings
+3e4fee3 feat(auth): implement discord oauth2 for helper applications
+cba328a fix(api): final attempt at discord notification with robust logging and direct channel ID
+b4f33cb fix(api): force channel ID and improve error logging for discord
+04a5b5d fix(vercel): fix 404 by correctly routing to public/ directory
+57c3522 fix(routing): explicit api and page routing for vercel
+71d8c54 fix(api): use modern fetch for discord notifications and improve reliability
+aecb641 fix(integrity): fix vanilla-tilt block on helper page
+0524b36 feat(helper): automate role assignment and fix application notification
+04ed29e fix(api): improve error diagnostics for helper application
+534c81f feat(api): add helper-application endpoint for Vercel submissions
+3f314a3 fix(domain): hardcode vercel fallback to prevent localhost links in discord
+2111c3b feat(config): force Vercel domain as fallback and cleanup local console logs
+f7a5ec5 feat(announcement): upgrade recruitment message with new domain and branding
+fdce382 feat(ui): add favicon and navigation logo image to all pages
+79c3582 fix: simplified vercel routing for cleaner navigation
+9ed2697 fix: vercel cleanUrls and absolute-ish routing to fix 404 on helper-application
+805e850 feat(config): point PUBLIC_BASE_URL to Vercel and sync UI status text
+12095f8 fix: vercel 404 and prepare manual sql for bot_status table
+0cf94f5 chore: add vercel.json for correct routing
+5885cba feat: sync Vercel API and status pushing logic to GitHub
+e3873f2 feat(bot): add optional url parameter to /helper_announcement to fix localhost issues
+6d792d0 docs(ui): update title in status page
+f5e8a30 feat: add ONLY_WEB support to prevent double bot login
+5f10fb6 fix(startup): change clientReady back to ready event to ensure server starts on northflank
+88a277a fix(ui): explicitly resave v2 index.html to fix utf16 encoding issue
+678abc2 fix(ui): restore v2 index.html
+9a11360 fix(ui): use markdown link within v2 component instead of actionrow button
+55104de feat(bot): add /helper_announcement command for recruitment
+deffb43 feat(ui): premium dashboard, custom emojis, northflank metrics, helper app form
+45143e8 UI Fix: Dynamic name scaling and 5-Star seal repositioning to prevent messy overlaps
+b733303 Fix: Resolved AI chat crash (setStyle error) and modernized ephemeral flags
+0cf6d95 Permission: Allowed Helper roles to close tickets both via /close-ticket and the Close button
+e3384bc UI Fix: Corrected messy layout and alignment on Vouch Card PNG
+bf4e7ff Fix: Added missing SectionBuilder and ThumbnailBuilder imports to resolve ReferenceError in V2 containers
+591277e Admin: Enabled bulk vouch adding with /addvouch amount option
+37f94a6 Enhance: Format /command_logs correctly with pagination and exact text layout requested. Also log Modal vouches correctly.
+7b41b57 Fix UI: Clean up redundant sub-headers on all PNG cards and restore missing definitions
+463af6f Enhance: Leaderboard now sorts by Total Vouches predominantly
+4196630 Fix UI: resolved text overlap in Helper Profile header and vertically balanced left column elements
+c895246 Fix UI: added dynamic scaling badge, user avatars on V2 components, removed panel spam
+5108450 Feature: added premium bot status website with live API endpoint
+587ca21 Major: renamed UI labels, added weekly/monthly tracker, claim locks channel, close protection, ghost ping
+b969c06 System: fully implemented all administrative slash commands and settings persistence
+84b2dca System: implemented daily message reset and updated requirement UI
+6476807 Fix: updated ready event to clientReady to resolve deprecation warning
+ffaec0b UI: refined ticket mentions to match user request layout
+e3a707f UI: upgraded ticket ping notification to premium V2 component
+5de54ef System: added unclaim functionality for tickets
+880c3ed Ultra-Boosted: added booster priority bumping and UI badges
+dbad4b7 Fix: optimized interaction handling with early deferral and parallel command registration
+d84aa39 Fix: correctly register commands globally and for guild with proper event name
+d9ff678 Fix: restored missing buildLeaderboardCardWithAvatars function
+a6ed9d7 Ultra-Premium Bot Status & 15+ Slash Commands Integrated
+09c300b Ultra-Premium Leaderboard & Northflank Ready

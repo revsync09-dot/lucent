@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyperions | Trading Hub</title>
+  <meta name="description" content="Configure and manage your Hyperions trade offers." />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="stylesheet" href="/index.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7c6fff;
+      --primary-glow: rgba(124, 111, 255, 0.5);
+      --bg: #05050a;
+      --sidebar-bg: rgba(10, 10, 20, 0.8);
+      --glass: rgba(15, 15, 25, 0.5);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text: #e0e0f0;
+      --text-dim: #94a3b8;
+      --success: #22c55e;
+    }
+
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(124, 111, 255, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(124, 111, 255, 0.03) 0%, transparent 40%);
+    }
+
+    /* Sidebar Navigation */
+    nav.sidebar {
+      width: 280px;
+      background: var(--sidebar-bg);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      padding: 40px 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 50px;
+      padding: 0 10px;
+    }
+
+    .sidebar-header img {
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .sidebar-header .title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 14px 20px;
+      border-radius: 16px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-item.active {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 8px 20px var(--primary-glow);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Main Content Area */
+    main.content {
+      flex: 1;
+      padding: 40px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    header.view-header {
+      margin-bottom: 40px;
+    }
+
+    header.view-header h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header.view-header p {
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    /* Trade View Styles */
+    .glass-card {
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .trade-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 12px; position: relative; }
+    label { font-size: 0.95rem; font-weight: 600; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+    textarea {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 18px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 160px;
+      transition: all 0.3s ease;
+    }
+    textarea:focus { outline: none; border-color: var(--primary); background: rgba(255, 255, 255, 0.05); }
+    textarea.data-store { position:absolute; inset:0; opacity:0; pointer-events:none; min-height:0; height:0; padding:0; border:0; }
+
+    .item-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .selector-shell {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-height: 480px;
+    }
+
+    .selector-toolbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .selector-actions {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      width:100%;
+    }
+
+    .selector-count {
+      font-size: .72rem;
+      color: var(--text-dim);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .catalog-search {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #fff;
+      font: inherit;
+      outline: none;
+    }
+
+    .catalog-search:focus {
+      border-color: rgba(124, 111, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(124,111,255,.1);
+    }
+
+    .selected-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      min-height: 54px;
+    }
+
+    .selected-card {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(124,111,255,.1);
+      border: 1px solid rgba(124,111,255,.16);
+    }
+
+    .selected-card img {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .selected-name {
+      font-size: .82rem;
+      font-weight: 700;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .remove-item {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      border: 0;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .catalog-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      gap: 12px;
+      max-height: 280px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .catalog-filter {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #fff;
+      font: inherit;
+      min-width: 180px;
+    }
+    .catalog-filter option {
+      background: #12121b;
+      color: #fff;
+    }
+
+    .catalog-entry {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.025);
+      border-radius: 18px;
+      overflow:hidden;
+      cursor:pointer;
+      transition: .22s;
+    }
+
+    .catalog-entry:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124,111,255,.34);
+      box-shadow: 0 14px 30px rgba(0,0,0,.18);
+    }
+
+    .catalog-entry img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display:block;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .catalog-entry-body {
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .catalog-entry-title {
+      font-size: .8rem;
+      font-weight: 700;
+      line-height: 1.25;
+      min-height: 34px;
+    }
+
+    .catalog-entry-meta {
+      font-size: .66rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+    }
+
+    .catalog-empty {
+      color: var(--text-dim);
+      font-size: .88rem;
+      padding: 18px 0;
+    }
+
+    .suggestion-bank {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .suggestion-chip {
+      background: rgba(124, 111, 255, 0.08);
+      color: #d7d3ff;
+      border: 1px solid rgba(124, 111, 255, 0.18);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .suggestion-chip:hover {
+      transform: translateY(-1px);
+      background: rgba(124, 111, 255, 0.14);
+      color: #fff;
+    }
+
+    .item-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: popIn 0.3s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .item-tag img { width: 24px; height: 24px; border-radius: 4px; }
+
+    .bottom-bar {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-p { background: var(--primary); color: #fff; box-shadow: 0 4px 15px var(--primary-glow); }
+    .btn-p:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-glow); }
+    .btn-s { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+    .btn-s:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* History View Styles */
+    .history-list { display: flex; flex-direction: column; gap: 15px; }
+    .history-item {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    .history-item:hover { transform: scale(1.01); background: rgba(255,255,255,0.03); }
+    .history-info { display: flex; flex-direction: column; gap: 4px; }
+    .history-game { font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+    .history-items { font-weight: 600; font-size: 1.1rem; }
+    .history-date { font-size: 0.85rem; color: var(--text-dim); }
+
+    /* Settings View Styles */
+    .settings-group { margin-bottom: 30px; }
+    .setting-card {
+      background: rgba(255,255,255,0.02);
+      padding: 24px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .setting-info h4 { margin: 0; font-size: 1.1rem; }
+    .setting-info p { margin: 5px 0 0; color: var(--text-dim); font-size: 0.9rem; }
+
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px; width: 18px;
+      left: 4px; bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    .status-toast {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      padding: 16px 30px;
+      border-radius: 16px;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: none;
+      animation: slideIn 0.3s ease-out;
+      z-index: 1000;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .section-label { margin-bottom: 20px !important; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .bottom-info { font-size: 0.9rem; color: var(--text-dim); }
+
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <img src="/logo.png" alt="Logo" />
+      <span class="title">HYPERIONS</span>
+    </div>
+    
+    <div class="nav-links">
+      <div class="nav-item active" data-view="trade">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+        New Trade
+      </div>
+      <div class="nav-item" data-view="history">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        History
+      </div>
+      <div class="nav-item" data-view="settings">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        Settings
+      </div>
+    </div>
+  </nav>
+
+  <main class="content">
+    <!-- Trade Form View -->
+    <div id="tradeView" class="view active">
+      <header class="view-header">
+        <h2 id="viewTitle">New Trade Offer</h2>
+        <p id="viewSubtitle">Fetching game data...</p>
+      </header>
+
+      <div class="glass-card">
+        <form id="tradeForm">
+          <div class="trade-grid">
+            <div class="input-group">
+              <label><span>📦</span> Items You're Offering</label>
+              <textarea id="tradingInput" class="data-store" placeholder="What items are you giving? List them here..." required></textarea>
+              <div class="selector-shell">
+                <div class="selector-toolbar">
+                  <span class="selector-count" id="tradingCount">0 Items Selected</span>
+                </div>
+                <div class="selector-actions">
+                  <input id="tradingSearch" class="catalog-search" type="text" placeholder="Search catalog for offered items...">
+                  <select id="tradingCategory" class="catalog-filter" title="Filter offered items by category"></select>
+                </div>
+                <div id="tradingPreview" class="selected-grid"></div>
+                <div id="tradingSuggestions" class="catalog-grid"></div>
+              </div>
+            </div>
+            <div class="input-group">
+              <label><span>🔍</span> Items You're Looking For</label>
+              <textarea id="lookingInput" class="data-store" placeholder="What do you want in return? (items, robux, gems...)" required></textarea>
+              <div class="selector-shell">
+                <div class="selector-toolbar">
+                  <span class="selector-count" id="lookingCount">0 Items Selected</span>
+                </div>
+                <div class="selector-actions">
+                  <input id="lookingSearch" class="catalog-search" type="text" placeholder="Search catalog for wanted items...">
+                  <select id="lookingCategory" class="catalog-filter" title="Filter wanted items by category"></select>
+                </div>
+                <div id="lookingPreview" class="selected-grid"></div>
+                <div id="lookingSuggestions" class="catalog-grid"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label style="margin-bottom: 20px;"><span>⚙️</span> Quick Preferences</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="setting-card">
+                <div class="setting-info">
+                  <h4>Verified Only</h4>
+                  <p>Only verified users can see/offer</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="verifiedOnly" title="Toggle Verified Only">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-card">
+                <div class="setting-info">
+                  <h4>Middleman</h4>
+                  <p>Always require a MM for this trade</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="middlemanRequired" title="Toggle Middleman Required">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-bar">
+            <p class="bottom-info">Trade will be broadcasted to Discord and the web network.</p>
+            <button type="submit" id="submitBtn" class="btn btn-p">Publish Trade Post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- History View -->
+    <div id="historyView" class="view">
+      <header class="view-header">
+        <h2>Trade History</h2>
+        <p>Your previous trade offers and results.</p>
+      </header>
+      <div id="historyContainer" class="history-list">
+        <p>Loading history...</p>
+      </div>
+    </div>
+
+    <!-- Settings View -->
+    <div id="settingsView" class="view">
+      <header class="view-header">
+        <h2>Preferences</h2>
+        <p>Customize your trading experience.</p>
+      </header>
+      <div class="glass-card">
+        <div class="setting-card">
+          <div class="setting-info">
+            <h4>Anonymous Publishing</h4>
+            <p>Hide your username on the web listing</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-card">
+          <div class="setting-info">
+            <h4>Auto-Thread Creation</h4>
+            <p>Automatically open a thread when someone clicks Trade</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="status-toast"></div>
+
+  <script>
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('session') || params.get('token');
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      const views = document.querySelectorAll('.view');
+      const toast = document.getElementById('toast');
+      const historyContainer = document.getElementById('historyContainer');
+      const viewSubtitle = document.getElementById('viewSubtitle');
+      const tradingInput = document.getElementById('tradingInput');
+      const lookingInput = document.getElementById('lookingInput');
+      const tradingSuggestions = document.getElementById('tradingSuggestions');
+      const lookingSuggestions = document.getElementById('lookingSuggestions');
+      const tradingSearch = document.getElementById('tradingSearch');
+      const lookingSearch = document.getElementById('lookingSearch');
+      const tradingCategory = document.getElementById('tradingCategory');
+      const lookingCategory = document.getElementById('lookingCategory');
+      const tradingCount = document.getElementById('tradingCount');
+      const lookingCount = document.getElementById('lookingCount');
+
+      function showToast(msg, type = 'success') {
+        toast.textContent = msg;
+        toast.style.borderColor = type === 'success' ? 'var(--success)' : '#ef4444';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+      }
+
+      let sessionData = null;
+      const directGame = String(params.get('game') || '').trim().toUpperCase();
+      const preselectSlug = String(params.get('add') || '').trim().toLowerCase();
+
+      if (token) {
+        try {
+          const res = await fetch(`/api/trades/session?session=${token}`);
+          sessionData = await res.json();
+          if (!sessionData.success) throw new Error();
+          viewSubtitle.textContent = `Trading in ${sessionData.session.gameKey.toUpperCase()}`;
+        } catch {
+          document.body.innerHTML = '<div style="margin: auto; text-align: center;"><h1>Session Expired</h1><p>The trade link has expired or is invalid.</p></div>';
+          return;
+        }
+      } else if (directGame) {
+        try {
+          const cookieMatch = document.cookie.match(/(?:^|;\s*)discord_user=([^;]+)/);
+          if (!cookieMatch) throw new Error('verify');
+          const viewer = JSON.parse(decodeURIComponent(cookieMatch[1]));
+          const profileRes = await fetch(`/api/user-profile?id=${encodeURIComponent(viewer.id)}`);
+          const profile = profileRes.ok ? await profileRes.json() : null;
+          sessionData = { success: true, session: { gameKey: directGame, userId: viewer.id, guildId: null } };
+          viewSubtitle.textContent = profile?.isVerified
+            ? `Trading in ${directGame} via verified website access`
+            : `Trading in ${directGame} via Discord identity sync`;
+        } catch {
+          document.body.innerHTML = '<div style="margin: auto; text-align: center;"><h1>Verification Required</h1><p>Verify first, then open the trade builder again from the Trade Hub.</p></div>';
+          return;
+        }
+      } else {
+        document.body.innerHTML = '<div style="margin: auto; text-align: center;"><h1>Trade Builder Locked</h1><p>Open this page from a trade session or from the Trade Hub with a selected game.</p></div>';
+        return;
+      }
+
+      // View Switching
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-view');
+          navItems.forEach(n => n.classList.remove('active'));
+          item.classList.add('active');
+          views.forEach(v => v.classList.remove('active'));
+          document.getElementById(target + 'View').classList.add('active');
+          if (target === 'history') loadHistory();
+        });
+      });
+
+      // Wiki Search Logic
+      const imgCache = new Map();
+      let catalogItems = [];
+      let selectedTrading = [];
+      let selectedLooking = [];
+      let availableCategories = [];
+
+      function syncSelectionToTextarea(textarea, items) {
+        textarea.value = items.map(item => item.item_name).join('\n');
+      }
+
+      function getSelectedState(side) {
+        return side === 'trading' ? selectedTrading : selectedLooking;
+      }
+
+      function setSelectedState(side, next) {
+        if (side === 'trading') selectedTrading = next;
+        else selectedLooking = next;
+      }
+
+      function renderSelected(side) {
+        const isTrading = side === 'trading';
+        const selected = getSelectedState(side);
+        const preview = document.getElementById(`${side}Preview`);
+        const counter = isTrading ? tradingCount : lookingCount;
+        const textarea = isTrading ? tradingInput : lookingInput;
+
+        syncSelectionToTextarea(textarea, selected);
+        counter.textContent = `${selected.length} Item${selected.length === 1 ? '' : 's'} Selected`;
+
+        if (!selected.length) {
+          preview.innerHTML = '<div class="catalog-empty">No items selected yet. Pick them from the catalog below.</div>';
+          return;
+        }
+
+        preview.innerHTML = selected.map(item => `
+          <div class="selected-card">
+            <img src="${item.image_url || '/logo.png'}" alt="${item.item_name}" onerror="this.src='/logo.png'">
+            <span class="selected-name">${item.item_name}</span>
+            <button type="button" class="remove-item" data-side="${side}" data-item="${item.slug}">×</button>
+          </div>
+        `).join('');
+
+        preview.querySelectorAll('.remove-item').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const current = getSelectedState(btn.dataset.side);
+            setSelectedState(btn.dataset.side, current.filter(item => item.slug !== btn.dataset.item));
+            renderSelected(btn.dataset.side);
+          });
+        });
+      }
+
+      function addItemToSelection(side, item) {
+        const current = getSelectedState(side);
+        if (current.some(entry => entry.slug === item.slug)) return;
+        setSelectedState(side, [...current, item].slice(0, 30));
+        renderSelected(side);
+      }
+
+      function renderCatalog(target, items, side) {
+        if (!items.length) {
+          target.innerHTML = '<div class="catalog-empty">No matching items found in the imported catalog.</div>';
+          return;
+        }
+        target.innerHTML = items.map(item => `
+          <article class="catalog-entry" data-side="${side}" data-slug="${item.slug}">
+            <img src="${item.image_url || '/logo.png'}" alt="${item.item_name}" loading="lazy" onerror="this.src='/logo.png'">
+            <div class="catalog-entry-body">
+              <div class="catalog-entry-title">${item.item_name}</div>
+              <div class="catalog-entry-meta">${item.category || item.game_key}</div>
+            </div>
+          </article>
+        `).join('');
+
+        target.querySelectorAll('.catalog-entry').forEach(card => {
+          card.addEventListener('click', () => {
+            const item = catalogItems.find(entry => entry.slug === card.dataset.slug);
+            if (item) addItemToSelection(card.dataset.side, item);
+          });
+        });
+      }
+
+      function renderCategoryOptions(selectEl) {
+        const currentValue = selectEl.value || '';
+        selectEl.innerHTML = ['<option value="">All categories</option>']
+          .concat(availableCategories.map((category) => `<option value="${category}">${category}</option>`))
+          .join('');
+        selectEl.value = availableCategories.includes(currentValue) ? currentValue : '';
+      }
+
+      function filterCatalog(term, category) {
+        const needle = String(term || '').trim().toLowerCase();
+        return catalogItems.filter(item => {
+          const categoryValue = String(item.category || item.item_type || '').toLowerCase();
+          const matchesCategory = !category || categoryValue === String(category).toLowerCase();
+          if (!matchesCategory) return false;
+          if (!needle) return true;
+          return [item.item_name, item.category, item.item_type, item.description]
+            .filter(Boolean)
+            .some(value => String(value).toLowerCase().includes(needle));
+        }).slice(0, 120);
+      }
+
+      function refreshCatalog(side) {
+        const isTrading = side === 'trading';
+        renderCatalog(
+          isTrading ? tradingSuggestions : lookingSuggestions,
+          filterCatalog(
+            isTrading ? tradingSearch.value : lookingSearch.value,
+            isTrading ? tradingCategory.value : lookingCategory.value
+          ),
+          side
+        );
+      }
+
+      async function loadCatalogSuggestions() {
+        try {
+          const allItems = [];
+          let page = 1;
+          let totalPages = 1;
+          do {
+            const res = await fetch(`/api/items?game=${sessionData.session.gameKey}&limit=500&page=${page}`);
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error || 'Catalog fetch failed');
+            allItems.push(...(data.items || []));
+            totalPages = Number(data.meta?.totalPages || 1);
+            page += 1;
+          } while (page <= totalPages);
+
+          catalogItems = allItems;
+          availableCategories = Array.from(new Set(
+            catalogItems.map(item => item.category || item.item_type).filter(Boolean)
+          )).sort((a, b) => a.localeCompare(b));
+
+          renderCategoryOptions(tradingCategory);
+          renderCategoryOptions(lookingCategory);
+          refreshCatalog('trading');
+          refreshCatalog('looking');
+          if (preselectSlug) {
+            const preselected = catalogItems.find((item) => item.slug === preselectSlug);
+            if (preselected) addItemToSelection('trading', preselected);
+          }
+          renderSelected('trading');
+          renderSelected('looking');
+        } catch {
+          tradingSuggestions.innerHTML = '';
+          lookingSuggestions.innerHTML = '';
+        }
+      }
+      async function updatePreview(input, containerId) {
+        const container = document.getElementById(containerId);
+        const lines = input.value.split('\n').filter(l => l.trim().length > 2).slice(0, 5);
+        container.innerHTML = '';
+        
+        for (const item of lines) {
+          const cleanItem = item.trim();
+          const tag = document.createElement('div');
+          tag.className = 'item-tag';
+          tag.innerHTML = `<span>⏳</span> ${cleanItem}`;
+          container.appendChild(tag);
+
+          if (imgCache.has(cleanItem)) {
+            tag.innerHTML = imgCache.get(cleanItem) ? `<img src="${imgCache.get(cleanItem)}"/> ${cleanItem}` : `📦 ${cleanItem}`;
+          } else {
+            fetch(`/api/wiki/image?game=${sessionData.session.gameKey}&item=${encodeURIComponent(cleanItem)}`)
+              .then(r => r.json())
+              .then(d => {
+                imgCache.set(cleanItem, d.imageUrl);
+                tag.innerHTML = d.imageUrl ? `<img src="${d.imageUrl}"/> ${cleanItem}` : `📦 ${cleanItem}`;
+              });
+          }
+        }
+      }
+
+      tradingSearch.addEventListener('input', () => refreshCatalog('trading'));
+      lookingSearch.addEventListener('input', () => refreshCatalog('looking'));
+      tradingCategory.addEventListener('change', () => refreshCatalog('trading'));
+      lookingCategory.addEventListener('change', () => refreshCatalog('looking'));
+
+      // History Loader
+      async function loadHistory() {
+        historyContainer.innerHTML = '<p>Loading history...</p>';
+        const res = await fetch(`/api/trades/history?session=${token}`);
+        const data = await res.json();
+        if (data.success && data.history.length > 0) {
+          historyContainer.innerHTML = data.history.map(t => `
+            <div class="history-item">
+              <div class="history-info">
+                <span class="history-game">${t.game_key}</span>
+                <span class="history-items">${t.trading_item.split('\n')[0]}...</span>
+                <span class="history-date">${new Date(t.created_at).toLocaleDateString()}</span>
+              </div>
+              <span style="color: var(--success); font-weight: 700;">PUBLISHED</span>
+            </div>
+          `).join('');
+        } else {
+          historyContainer.innerHTML = '<p>No trade history found.</p>';
+        }
+      }
+
+      // Form Submit
+      document.getElementById('tradeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Publishing...';
+
+        const payload = {
+          session: token,
+          gameKey: sessionData.session.gameKey,
+          trading: tradingInput.value,
+          lookingFor: lookingInput.value,
+          selectedTrading: selectedTrading,
+          selectedLooking: selectedLooking,
+          settings: {
+            verifiedOnly: document.getElementById('verifiedOnly').checked,
+            middlemanRequired: document.getElementById('middlemanRequired').checked
+          }
+        };
+
+        const res = await fetch('/api/trades/create-from-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          showToast('Trade published successfully!');
+          btn.textContent = 'Published ✅';
+        } else {
+          showToast(result.error || 'Failed to publish', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Publish Trade Post';
+        }
+      });
+
+      loadCatalogSuggestions();
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperions Bot — Status Dashboard</title>
+    <meta property="og:title" content="Hyperions Bot — Service">
+    <meta property="og:description" content="Helper application portal for Hyperions.">
+    <meta property="og:image" content="https://hyperionsapplication.xyz/logo.png">
+    <meta property="og:url" content="https://hyperionsapplication.xyz">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/globals.css">
+    <link rel="icon" type="image/png" href="/logo.png">
+    <style>
+        .status-hero {
+            padding: var(--sp-64) var(--sp-24);
+            text-align: center;
+        }
+        .status-hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: var(--sp-8);
+            line-height: 1.1;
+        }
+        .status-hero p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto var(--sp-32);
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: rgba(87, 242, 135, 0.1);
+            border: 1px solid rgba(87, 242, 135, 0.2);
+            border-radius: 50px;
+            color: #57F287;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(87, 242, 135, 0.1);
+            margin-bottom: var(--sp-48);
+        }
+        .status-dot-pulse {
+            width: 10px;
+            height: 10px;
+            background: #57F287;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(87, 242, 135, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(87, 242, 135, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(87, 242, 135, 0); }
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--sp-24);
+            margin-bottom: var(--sp-64);
+        }
+        .metric-card {
+            padding: var(--sp-32);
+            display: flex;
+            flex-direction: column;
+            gap: var(--sp-8);
+        }
+        .metric-icon { font-size: 1.5rem; }
+        .metric-label { font-size: 0.85rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; }
+        .metric-value { font-size: 2rem; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+        .uptime-panel { padding: var(--sp-32); margin-bottom: var(--sp-24); }
+        .uptime-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--sp-24); }
+        .uptime-pct { font-size: 1.5rem; font-weight: 800; color: #57F287; font-variant-numeric: tabular-nums; }
+        .uptime-chart {
+            display: flex;
+            gap: 4px;
+            height: 48px;
+            align-items: flex-end;
+        }
+        .uptime-bar {
+            flex: 1;
+            height: 100%;
+            background: rgba(87, 242, 135, 0.3);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .uptime-bar:hover { background: #57F287; transform: translateY(-4px); }
+        .uptime-bar.dn { background: rgba(255, 77, 77, 0.4); }
+        .uptime-bar.deg { background: rgba(255, 171, 0, 0.4); }
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--sp-16);
+        }
+        .service-item {
+            padding: var(--sp-24);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .service-name { font-weight: 800; font-size: 1.1rem; }
+        .service-status-pill { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
+        .status-op { background: rgba(87, 242, 135, 0.1); color: #57F287; border: 1px solid rgba(87, 242, 135, 0.2); }
+        .status-mn { background: rgba(255, 171, 0, 0.1); color: #FFAB00; border: 1px solid rgba(255, 171, 0, 0.2); }
+        .status-dn { background: rgba(255, 77, 77, 0.1); color: #FF4D4D; border: 1px solid rgba(255, 77, 77, 0.2); }
+        .infra-grid {
+            margin-top: var(--sp-64);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--sp-16);
+        }
+        .infra-bar-container { margin-bottom: var(--sp-24); }
+        .infra-header { display: flex; justify-content: space-between; margin-bottom: var(--sp-8); font-weight: 700; font-size: 0.95rem; }
+        .infra-track { height: 12px; background: rgba(255,255,255,0.05); border-radius: 50px; overflow: hidden; position: relative; }
+        .infra-fill { height: 100%; border-radius: 50px; transition: width 1s ease; }
+        .purple-fill { background: var(--gradient-primary); box-shadow: 0 0 10px rgba(156, 39, 176, 0.5); }
+        .blue-fill { background: var(--primary-blue); box-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
+        .pink-fill { background: var(--primary-pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.5); }
+        /* ── PREMIUM CURSOR SYSTEM DISABLED ─────────────────── */
+        * { cursor: auto !important; }
+        .cursor-follower, .dot-cursor, .dot-cursor-outer { display: none !important; }
+
+        @media (max-width: 900px) {
+            .nav-links {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(5,5,10,0.98);
+                backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2.5rem;
+                z-index: 1000;
+                clip-path: circle(0% at 50% 50%);
+                transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                pointer-events: none;
+                display: flex;
+            }
+            .nav-links.active {
+                clip-path: circle(150% at 50% 50%);
+                pointer-events: auto;
+            }
+            .nav-link { font-size: 2.5rem; font-weight: 900; letter-spacing: -0.05em; text-transform: lowercase; }
+            .nav-btn { display: none !important; }
+            .mobile-menu-toggle { display: flex !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <!-- Custom Cursors Removed -->
+    <header class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <img src="/logo.png" alt="Logo">
+                Hyperions
+            </a>
+            <nav class="nav-links">
+                <a href="/status" class="nav-link active">Status</a>
+                <a href="/helper-application" class="nav-link">Helper Application</a>
+                <a href="https://discord.gg/hyperions" class="nav-link" target="_blank">Discord</a>
+                <a href="#" class="nav-link">Documentation</a>
+            </nav>
+            <div style="display:flex; align-items:center; gap:1rem;">
+                <a href="https://discord.gg/hyperions" class="nav-btn" target="_blank">Join Discord</a>
+                <button class="mobile-menu-toggle" id="menuToggleMain" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); width:42px; height:42px; border-radius:12px; display:none; flex-direction:column; gap:5px; align-items:center; justify-content:center; cursor:pointer; z-index:1001;">
+                    <span style="display:block; width:20px; height:2px; background:#fff;"></span>
+                    <span style="display:block; width:20px; height:2px; background:#fff;"></span>
+                    <span style="display:block; width:20px; height:2px; background:#fff;"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="section-container">
+        <section class="status-hero reveal">
+        <div class="status-hero reveal" style="padding: 4rem 1rem 3rem;">
+            <span style="color: #c084fc; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem; display: block; text-shadow: 0 0 15px rgba(192, 132, 252, 0.4);">MONITORING</span>
+            <h1 class="heading-font" style="font-size: clamp(2.5rem, 6vw, 3.8rem); font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.02em;">Status of the Hyperions Bot</h1>
+            <p style="font-size: 1.25rem; color: var(--text-dim); max-width: 600px; margin: 0 auto; line-height: 1.6; font-weight: 500;">Live operational data refreshed every 30 seconds from our infrastructure nodes.</p>
+        </div>
+
+        <div class="glass-card uptime-panel reveal" style="background: rgba(10, 10, 15, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.5rem; max-width: 900px; margin: 0 auto 4rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+            <div class="uptime-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-family: var(--font-display); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; margin: 0;">24-Hour Uptime History</h2>
+                <div class="uptime-pct" id="uptimePct" style="font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; color: #10b981; margin: 0; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4);">100.00%</div>
+            </div>
+            <div class="uptime-chart" id="uptimeBar" style="height: 48px; gap: 6px; display: flex;">
+            </div>
+        </div>
+        <div class="metrics-grid reveal">
+            <article class="glass-card metric-card">
+                <span class="metric-icon">🚀</span>
+                <span class="metric-label">System Uptime</span>
+                <span class="metric-value" id="uptimeVal">--</span>
+            </article>
+            <article class="glass-card metric-card">
+                <span class="metric-icon">🎚️</span>
+                <span class="metric-label">Global Latency</span>
+                <span class="metric-value"><span id="pingVal">--</span>ms</span>
+            </article>
+            <article class="glass-card metric-card">
+                <span class="metric-icon">🎫</span>
+                <span class="metric-label">Active Tickets</span>
+                <span class="metric-value" id="ticketsVal">--</span>
+            </article>
+            <article class="glass-card metric-card">
+                <span class="metric-icon">👥</span>
+                <span class="metric-label">Total Users</span>
+                <span class="metric-value" id="usersVal">--</span>
+            </article>
+        </div>
+        <section class="reveal" style="margin-top: var(--sp-64);">
+            <h2 class="heading-font" style="margin-bottom: var(--sp-32);">Live Helper Availability</h2>
+            <div class="metrics-grid" id="presenceGrid">
+                
+            </div>
+            <div style="text-align: center; margin-top: var(--sp-24);">
+               <span class="status-pill" style="background: rgba(82, 199, 255, 0.1); border-color: rgba(82, 199, 255, 0.2); color: #52c7ff;">
+                   <span id="unclaimedTicketsCount">0</span> Tickets Waiting in Queue
+               </span>
+            </div>
+        </section>
+        <!-- Technical services removed as per request -->
+        <section class="reveal" style="margin-top: var(--sp-64);">
+            <h2 class="heading-font" style="margin-bottom: var(--sp-32);">Infrastructure Capacity</h2>
+            <div class="infra-grid">
+               <div class="infra-bar-container">
+                  <div class="infra-header">
+                      <span>Bot Cluster CPU</span>
+                      <span id="cpuVal">0%</span>
+                  </div>
+                  <div class="infra-track"><div class="infra-fill purple-fill" id="cpuBar" style="width: 0%"></div></div>
+               </div>
+               <div class="infra-bar-container">
+                  <div class="infra-header">
+                      <span>Server RAM Usage</span>
+                      <span id="ramVal">0%</span>
+                  </div>
+                  <div class="infra-track"><div class="infra-fill blue-fill" id="ramBar" style="width: 0%"></div></div>
+               </div>
+               <div class="infra-bar-container">
+                  <div class="infra-header">
+                      <span>Global Traffic Load</span>
+                      <span id="loadVal">0%</span>
+                  </div>
+                  <div class="infra-track"><div class="infra-fill pink-fill" id="loadBar" style="width: 0%"></div></div>
+               </div>
+            </div>
+        </section>
+        <section class="incident-log reveal">
+            <h2 class="heading-font">Incident Log</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-meta">MARCH 08, 2026 • 03:30 CET</span>
+                    <p class="timeline-content">Hyperions Internal Dashboard update completed successfully. System performance optimized.</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-meta">MARCH 07, 2026 • 12:45 CET</span>
+                    <p class="timeline-content">Discord Token renewal and security audit finalizing. No downtime recorded.</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-meta">MARCH 06, 2026 • 21:00 CET</span>
+                    <p class="timeline-content">Database tier upgrade to Enterprise scale for upcoming season launch.</p>
+                </div>
+            </div>
+        </section>
+        <section class="centered-content reveal" style="margin-top: var(--sp-64);">
+            <a href="https://discord.gg/hyperions" class="btn-primary" style="padding: 20px 48px; font-size: 1.2rem;">Join Hyperions Support</a>
+        </section>
+    </main>
+    <footer class="section-container" style="border-top: 1px solid var(--border-glass); margin-top: var(--sp-64); text-align: center;">
+        <p style="color: var(--text-dim); font-size: 0.85rem; opacity: 0.6;">&copy; 2026 Hyperions Agency. All systems operational.</p>
+    </footer>
+    <script src="/status.js"></script>
+    <script>
+        // Standard system cursor is now used
+
+        const menuToggle = document.getElementById('menuToggleMain');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle && navLinks) {
+          menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+          });
+          navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+              menuToggle.classList.remove('active');
+              navLinks.classList.remove('active');
+              document.body.style.overflow = '';
+            });
+          });
+        }
+
+        const reveal = () => {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('visible');
+                }
+            });
+        };
+        window.addEventListener('scroll', reveal);
+        window.onload = reveal;
+    </script>
+</body>
+</html>

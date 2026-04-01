@@ -1,0 +1,20 @@
+77e160f Remove all remaining block comments /* ... */
+4dfae60 Remove all system comments to clean up code
+57439dd Add modmail initial message, sticky banner, and update ticket naming format
+cc44fbd Add missing games (UTD, AV, BL, SP, ARX) to helper application website
+4e724d8 Fix ReferenceError: carryGameSelectRow is not defined
+dcd4d70 Add v3.3.0 update entry to status page
+821d52b Add premium loading screen to status page
+1184e99 Fix EADDRINUSE error by removing duplicate status server start
+3ce8304 Fix image rendering in modmail widget and ensure it loads on all pages
+ea712c5 Fix bot thread creation by restoring ready event and status server initialization
+ce3fca3 Enhance modmail with auto-deletion, add Anime Rangers X support, and refine carry panel
+2878712 Modmail: Staff name colors, larger emojis, fix image forwarding, fix first message bug
+2186ef9 Modmail: Support image attachments from Discord threads in website chat
+c1e2580 Modmail: Fix website emojis by forcing cache reload and cleaning staff reply text
+a49c845 Fix modmail: robust thread creation, fix emoji rendering by fetching actual objects, fallback to channel if thread fails
+0595ccf Modmail: Use custom Discord emojis in Vercel chat widget
+c8cf64a Modmail: Integrate custom emoji IDs for staff, user, and log embeds
+d3e8f7b Modmail: public threads from message, grouping prevents duplicates, staff replies in threads
+4457fce Simplify modmail: direct channel embeds, no threads, !reply command for staff
+3c80b13 Fix modmail: message-based threads visible in channel, group messages to prevent duplicates
