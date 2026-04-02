@@ -3198,11 +3198,13 @@ async function handleButton(interaction) {
   if (interaction.customId === TICKET_CLAIM) {
     let ticket = ticketState.get(interaction.channel.id);
     if (!ticket) {
+      console.log(`[claim-debug] Ticket not in memory for ${interaction.channel.id}, fetching from DB...`);
       const row = await getTicketByChannelId(interaction.channel.id).catch(() => null);
       ticket = ticketFromDbRow(row);
       if (ticket) {
         ticketState.set(interaction.channel.id, ticket);
       } else {
+        console.warn(`[claim-debug] Ticket not found in DB for ${interaction.channel.id}`);
         await replyV2(interaction, 'Not Found', ['Carry request data not found.'], { ephemeral: true, accent: 0xff6b6b });
         return;
       }
@@ -3292,6 +3294,7 @@ async function handleButton(interaction) {
     } catch (e) {
       console.error('[claim] permission lockdown failed', e?.message);
     }
+    console.log(`[claim-debug] Ticket ${interaction.channel.id} claimed by ${interaction.user.tag}`);
     await updateTicketMessage(interaction.channel, ticket);
     await replyV2(interaction, 'Claimed', [`Carry request claimed by <@${interaction.user.id}>. Channel is now locked for other helpers.`], { accent: 0x57f287 });
     await sendLog(interaction.guild, `Carry request claimed: <#${interaction.channel.id}> by <@${interaction.user.id}>`);
@@ -3300,11 +3303,16 @@ async function handleButton(interaction) {
   if (interaction.customId === TICKET_UNCLAIM) {
     let ticket = ticketState.get(interaction.channel.id);
     if (!ticket) {
+      console.log(`[unclaim-debug] Ticket not in memory for ${interaction.channel.id}, fetching from DB...`);
       const row = await getTicketByChannelId(interaction.channel.id).catch(() => null);
       ticket = ticketFromDbRow(row);
       if (ticket) ticketState.set(interaction.channel.id, ticket);
     }
-    if (!ticket) return;
+    if (!ticket) {
+      console.warn(`[unclaim-debug] Ticket not found for ${interaction.channel.id}`);
+      await replyV2(interaction, 'Not Found', ['No active ticket record found.'], { ephemeral: true, accent: 0xff6b6b });
+      return;
+    }
     const isAssigned = String(ticket.claimed) === String(interaction.user.id);
     const isStaffUser = isStaff(interaction.member);
     if (!isAssigned && !isStaffUser) {
@@ -3444,15 +3452,17 @@ async function handleButton(interaction) {
   if (interaction.customId === TICKET_COMPLETE_PROMPT) {
     let ticket = ticketState.get(interaction.channel.id);
     if (!ticket) {
+      console.log(`[complete-debug] Fetching ticket from DB for ${interaction.channel.id}...`);
       const row = await getTicketByChannelId(interaction.channel.id).catch(() => null);
       ticket = ticketFromDbRow(row);
       if (ticket) ticketState.set(interaction.channel.id, ticket);
     }
-    if (!ticket?.claimed) {
-      await replyV2(interaction, 'Not Ready', ['This action only works after a helper has claimed the ticket.'], {
-        ephemeral: true,
-        accent: 0xffcc4d
-      });
+    if (!ticket) {
+      await replyV2(interaction, 'Not Found', ['No live ticket found for this channel.'], { ephemeral: true, accent: 0xff6b6b });
+      return;
+    }
+    if (!ticket.claimed) {
+      await replyV2(interaction, 'Not Ready', ['Carry must be claimed before marking as complete.'], { ephemeral: true, accent: 0xffcc4d });
       return;
     }
     const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
@@ -3481,11 +3491,16 @@ async function handleButton(interaction) {
   if (interaction.customId === TICKET_VOUCH_BTN) {
     let ticket = ticketState.get(interaction.channel.id);
     if (!ticket) {
+      console.log(`[vouch-btn-debug] Fetching ticket from DB for ${interaction.channel.id}...`);
       const row = await getTicketByChannelId(interaction.channel.id).catch(() => null);
       ticket = ticketFromDbRow(row);
       if (ticket) ticketState.set(interaction.channel.id, ticket);
     }
-    if (!ticket?.claimed) {
+    if (!ticket) {
+      await replyV2(interaction, 'Not Found', ['No active record for this ticket.'], { ephemeral: true, accent: 0xff6b6b });
+      return;
+    }
+    if (!ticket.claimed) {
       await replyV2(interaction, 'Not Ready', ['The carry request must be claimed before you can vouch.'], {
         ephemeral: true,
         accent: 0xffcc4d
@@ -3750,7 +3765,7 @@ async function handleModal(interaction) {
       });
       return;
     }
-    const gameLabel = getGameLabel(gameRaw, gameRaw);
+    const gameLabel = GAME_LABEL[gameRaw] || gameRaw;
     const baseStats = await getHelperStats(interaction.guild.id, helperId).catch(() => ({
       total: 0, average: 0, fiveStarRate: 0, topGame: gameRaw
     }));
