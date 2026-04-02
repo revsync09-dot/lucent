@@ -2,55 +2,73 @@ const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const fs = require('fs');
 const path = require('path');
 const { env, normalizeGameKey, getGameLabel } = require('../config');
-const FONT_DIRS = [
+const FONT_SEARCH_DIRS = [
+  path.join(process.cwd(), 'assets', 'fonts'),
   path.join(__dirname, '..', '..', 'assets', 'fonts'),
   path.join(__dirname, '..', 'assets', 'fonts'),
-  path.join(process.cwd(), 'assets', 'fonts')
+  '/var/task/assets/fonts'
 ];
 const FONT_REGISTRY = [
-  { file: 'Inter-ExtraLight.ttf', family: 'Inter Light' },
-  { file: 'Inter-Light.ttf',      family: 'Inter Light' },
-  { file: 'Inter-Regular.ttf',    family: 'Inter' },
-  { file: 'Inter-Medium.ttf',     family: 'Inter Medium' },
-  { file: 'Inter-SemiBold.ttf',   family: 'Inter SemiBold' },
-  { file: 'Inter-Bold.ttf',       family: 'Inter Bold' },
-  { file: 'Inter-ExtraBold.ttf',  family: 'Inter ExtraBold' },
-  { file: 'Inter-Black.ttf',      family: 'Inter Black' }
+  { family: 'Inter Light', files: ['Inter-Light.ttf', 'Inter-ExtraLight.ttf', 'Inter-LightItalic.ttf'] },
+  { family: 'Inter', files: ['Inter-Regular.ttf', 'Inter-Italic.ttf', 'Inter-Light.ttf', 'Inter-ExtraLight.ttf'] },
+  { family: 'Inter Medium', files: ['Inter-Medium.ttf', 'Inter-MediumItalic.ttf', 'Inter-Regular.ttf', 'Inter-Light.ttf'] },
+  { family: 'Inter SemiBold', files: ['Inter-SemiBold.ttf', 'Inter-SemiBoldItalic.ttf', 'Inter-Medium.ttf', 'Inter-Black.ttf'] },
+  { family: 'Inter Bold', files: ['Inter-Bold.ttf', 'Inter-BoldItalic.ttf', 'Inter-SemiBold.ttf', 'Inter-Black.ttf'] },
+  { family: 'Inter ExtraBold', files: ['Inter-ExtraBold.ttf', 'Inter-ExtraBoldItalic.ttf', 'Inter-Bold.ttf', 'Inter-Black.ttf'] },
+  { family: 'Inter Black', files: ['Inter-Black.ttf', 'Inter-BlackItalic.ttf'] }
 ];
+const REGISTERED_FONT_FAMILIES = new Set();
 function pickFontFamily(weight) {
   const w = Math.min(900, Math.max(100, Number(weight) || 400));
-  if (w <= 300) return 'Inter Light';
-  if (w <= 400) return 'Inter';
-  if (w <= 500) return 'Inter Medium';
-  if (w <= 600) return 'Inter SemiBold';
-  if (w <= 700) return 'Inter Bold';
-  if (w <= 800) return 'Inter ExtraBold';
-  return 'Inter Black';
+  const preferred = w <= 300
+    ? 'Inter Light'
+    : w <= 400
+      ? 'Inter'
+      : w <= 500
+        ? 'Inter Medium'
+        : w <= 600
+          ? 'Inter SemiBold'
+          : w <= 700
+            ? 'Inter Bold'
+            : w <= 800
+              ? 'Inter ExtraBold'
+              : 'Inter Black';
+
+  if (REGISTERED_FONT_FAMILIES.has(preferred)) return preferred;
+  const fallbacks = ['Inter', 'Inter Medium', 'Inter SemiBold', 'Inter Bold', 'Inter ExtraBold', 'Inter Black', 'Inter Light'];
+  for (const family of fallbacks) {
+    if (REGISTERED_FONT_FAMILIES.has(family)) return family;
+  }
+  return 'sans-serif';
 }
 function initFontsSync() {
   console.log("[Fonts] Registering fonts...");
-  const dirs = [
-    path.join(process.cwd(), 'assets', 'fonts'),
-    path.join(__dirname, '..', '..', 'assets', 'fonts'),
-    '/var/task/assets/fonts'
-  ];
-
   let count = 0;
-  for (const { file, family } of FONT_REGISTRY) {
-    for (const dir of dirs) {
-      const p = path.join(dir, file);
-      if (fs.existsSync(p)) {
+  for (const { family, files } of FONT_REGISTRY) {
+    let registered = false;
+    for (const file of files) {
+      for (const dir of FONT_SEARCH_DIRS) {
+        const p = path.join(dir, file);
+        if (!fs.existsSync(p)) continue;
+        const stat = fs.statSync(p);
+        if (!stat.size) continue;
         try {
           GlobalFonts.registerFromPath(p, family);
+          REGISTERED_FONT_FAMILIES.add(family);
           count++;
+          registered = true;
           break;
         } catch (err) {
-          console.error(`[Fonts] Failed to register ${family}:`, err.message);
+          console.error(`[Fonts] Failed to register ${family} from ${file}:`, err.message);
         }
       }
+      if (registered) break;
+    }
+    if (!registered) {
+      console.warn(`[Fonts] No valid font file found for family ${family}; using runtime fallback.`);
     }
   }
-  console.log(`[Fonts] Successfully registered ${count} fonts.`);
+  console.log(`[Fonts] Successfully registered ${count} fonts. Families: ${[...REGISTERED_FONT_FAMILIES].join(', ') || 'none'}`);
 }
 initFontsSync();
 
