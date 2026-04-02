@@ -10,7 +10,8 @@ const gameMap = {
   SP: { label: 'Sailor Piece (SP)', emoji: 'SP' },
   ARX: { label: 'Anime Rangers X (ARX)', emoji: 'ARX' },
   ASTD: { label: 'All Star Tower Defense (ASTD)', emoji: 'ASTD' },
-  APX: { label: 'Anime Paradox (APX)', emoji: 'APX' }
+  APX: { label: 'Anime Paradox (APX)', emoji: 'APX' },
+  AOL: { label: 'Anime Overlord (AOL)', emoji: 'AOL' }
 };
 const GAME_ALIASES = {
   ALS: 'ALS',
@@ -33,7 +34,9 @@ const GAME_ALIASES = {
   ATSD: 'ASTD',
   ALLSTARTOWERDEFENSE: 'ASTD',
   APX: 'APX',
-  ANIMEPARADOX: 'APX'
+  ANIMEPARADOX: 'APX',
+  AOL: 'AOL',
+  ANIMEOVERLORD: 'AOL'
 };
 const HELPER_RANK_TIERS = [
   { min: 100, label: 'Meister' },
@@ -82,7 +85,7 @@ const env = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   minMessagesForTicket: Number(process.env.MIN_MESSAGES_FOR_TICKET || 30),
-  staffRoleId: process.env.CARRY_STAFF_ROLE_ID,
+  staffRoleId: process.env.CARRY_STAFF_ROLE_ID || process.env.HELPER_STAFF_ROLE,
   topHelperRoleId: process.env.TOP_HELPER_ROLE_ID,
   boosterRoleId: process.env.BOOSTER_ROLE_ID,
   logChannelId: process.env.LOG_CHANNEL_ID,
@@ -104,7 +107,8 @@ const env = {
     SP: process.env.TICKET_CATEGORY_SP_ID,
     ASTD: process.env.TICKET_CATEGORY_ASTD_ID || '1483552274167890182',
     ARX: process.env.TICKET_CATEGORY_ARX_ID,
-    APX: process.env.TICKET_CATEGORY_APX_ID
+    APX: process.env.TICKET_CATEGORY_APX_ID,
+    AOL: process.env.TICKET_CATEGORY_AOL_ID
   },
   helperRoles: {
     ALS: process.env.HELPER_ROLE_ALS_ID || process.env.HELPER_ROLE_RAIDS_ID,
@@ -116,7 +120,8 @@ const env = {
     SP: process.env.HELPER_ROLE_SP_ID || process.env.HELPER_ROLE_AP_ID,
     ASTD: process.env.HELPER_ROLE_ASTD_ID || '1483551983993487370',
     ARX: process.env.HELPER_ROLE_ARX_ID,
-    APX: process.env.HELPER_ROLE_APX_ID
+    APX: process.env.HELPER_ROLE_APX_ID || process.env.HELPER_ROLE_AP_ID,
+    AOL: process.env.HELPER_ROLE_AOL_ID
   },
   emojis: {
     title: emojiEntry('EMOJI_TITLE_ID', 'EMOJI_TITLE_NAME', 'icon2'),
@@ -148,6 +153,7 @@ const env = {
     serviceAstd: emojiEntry('EMOJI_SERVICE_ASTD_ID', 'EMOJI_SERVICE_ASTD_NAME', 'ASTD'),
     serviceArx: emojiEntry('EMOJI_SERVICE_ARX_ID', 'EMOJI_SERVICE_ARX_NAME', 'ARX', 'EMOJI_SERVICE_ARX', 'EMOJI_SERVICE_ARX_LABEL'),
     serviceApx: emojiEntry('EMOJI_SERVICE_APX_ID', 'EMOJI_SERVICE_APX_NAME', 'APX'),
+    serviceAol: emojiEntry('EMOJI_SERVICE_AOL_ID', 'EMOJI_SERVICE_AOL_NAME', 'AOL'),
     goal: emojiEntry('EMOJI_GOAL_ID', 'EMOJI_GOAL_NAME', 'goal'),
     gamemode: emojiEntry('EMOJI_GAMEMODE_ID', 'EMOJI_GAMEMODE_NAME', 'swords'),
     joinMethod: emojiEntry('EMOJI_JOIN_METHOD_ID', 'EMOJI_JOIN_METHOD_NAME', 'handshake'),
