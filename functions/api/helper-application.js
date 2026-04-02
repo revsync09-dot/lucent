@@ -188,7 +188,7 @@ export async function onRequest(context) {
   const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY;
   const discordToken = env.DISCORD_TOKEN;
   const webhookUrl = env.DISCORD_WEBHOOK_URL;
-  const finalChannelId = env.HELPER_APPLICATION_CHANNEL_ID || '1446695293944074351';
+  const finalChannelId = env.HELPER_APPLICATION_CHANNEL_ID || env.LOG_CHANNEL_ID;
 
   if (!supabaseUrl || !supabaseKey) {
     return new Response(JSON.stringify({ error: 'Supabase credentials missing.' }), { status: 500, headers });
@@ -320,15 +320,24 @@ export async function onRequest(context) {
       }
     }
 
+    let webhookDelivered = false;
     if (!botDelivered && webhookUrl) {
       try {
-        await fetch(webhookUrl, {
+        const webhookResponse = await fetch(webhookUrl, {
           method: 'POST',
           body: buildDiscordFormData({ ...payload, components: [] }, attachments)
         });
+        webhookDelivered = webhookResponse.ok;
       } catch (e) {
         console.error('Webhook fallback failed:', e.message);
       }
+    }
+
+    if (!botDelivered && !webhookDelivered) {
+      return new Response(JSON.stringify({
+        error: 'Application saved but Discord delivery failed.',
+        details: debugInfo || 'No bot token access and webhook fallback unavailable.'
+      }), { status: 502, headers });
     }
 
     return new Response(JSON.stringify({

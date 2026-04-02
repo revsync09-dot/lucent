@@ -121,7 +121,7 @@ function sanitizeAssetName(value) {
 }
 function normalizeGameList(input) {
   if (!Array.isArray(input)) return [];
-  const valid = new Set(['ALS', 'AG', 'AC', 'UTD', 'AV', 'BL', 'SP', 'ARX', 'ASTD', 'APX']);
+  const valid = new Set(['ALS', 'AG', 'AC', 'UTD', 'AV', 'BL', 'SP', 'ARX', 'ASTD', 'APX', 'AOL']);
   return [...new Set(input.map((item) => cleanText(item, 12).toUpperCase()).filter((item) => valid.has(item)))];
 }
 const GAME_QUESTIONNAIRES = {
@@ -202,6 +202,13 @@ const GAME_QUESTIONNAIRES = {
     'How active can you be to help people out in game?',
     'Are you able to solo Difficulty 10 Extreme?',
     'Are you able to solo Endless Mode wave 100+?',
+    'Please send an screenshot of your team below'
+  ],
+  AOL: [
+    'What is your Roblox Username?',
+    'How active can you be to help people out in game?',
+    'Are you able to clear current AOL endgame content?',
+    'Do you have the current meta units/team?',
     'Please send an screenshot of your team below'
   ]
 };
@@ -308,10 +315,13 @@ async function persistApplication(application) {
   await fs.promises.appendFile(APPLICATION_LOG_FILE, `${JSON.stringify(application)}\n`, 'utf8');
 }
 async function notifyDiscord(application) {
-  const channelId = '1446695293944074351';
-  if (!_client || !channelId) return;
+  const channelId = env.helperApplicationChannelId || process.env.HELPER_APPLICATION_CHANNEL_ID || env.logChannelId || process.env.LOG_CHANNEL_ID;
+  if (!_client) throw new Error('Discord client is not ready.');
+  if (!channelId) throw new Error('HELPER_APPLICATION_CHANNEL_ID or LOG_CHANNEL_ID is not configured.');
   const channel = await _client.channels.fetch(channelId).catch(() => null);
-  if (!channel || !channel.isTextBased()) return;
+  if (!channel || !channel.isTextBased()) {
+    throw new Error(`Unable to access helper application channel: ${channelId}`);
+  }
   const applicantUser = await _client.users.fetch(application.discordUserId).catch(() => null);
   const dateFormatted = new Date().toLocaleDateString('en-GB', {
        weekday: 'long',
@@ -374,11 +384,11 @@ async function notifyDiscord(application) {
       .setStyle(ButtonStyle.Secondary)
   );
   await channel.send({
-    content: `<@&1452363575464034396> New helper application received from <@${application.discordUserId}>!`,
+    content: `<@&${process.env.HELPER_STAFF_ROLE || env.staffRoleId || '1452363575464034396'}> New helper application received from <@${application.discordUserId}>!`,
     embeds: [v2Embed],
     files: (application.savedScreenshots || []).map((item) => item.filePath),
     components: [reviewRow, histRow]
-  }).catch(() => null);
+  });
 }
 async function forwardModmailToDiscord(conv, msg, username) {
   if (!_client || !MODMAIL_CHANNEL_ID) return;
