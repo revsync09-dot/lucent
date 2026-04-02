@@ -955,24 +955,41 @@ async function sendTranscript(channel, closedByUserId, ticketSnapshot = null) {
   }).catch(() => null);
 }
 async function finalizeTicketAfterVouch(channel, closedByUserId) {
-  if (!channel || !channel.isTextBased()) return;
+  if (!channel || !channel.isTextBased()) {
+    console.warn(`[finalize-vouch] Invalid channel provided for finalization.`);
+    return;
+  }
   const { ownerId } = extractTicketMeta(channel.topic);
-  if (!ownerId) return;
+  if (!ownerId) {
+    console.warn(`[finalize-vouch] Channel ${channel.id} has no ticket metadata in topic.`);
+    return;
+  }
   const channelId = channel.id;
-  const ticketSnapshot = ticketState.get(channelId) || ticketFromDbRow(await getTicketByChannelId(channelId).catch(() => null));
+  console.log(`[finalize-vouch] Finalizing ticket ${channelId} (Owner: ${ownerId}) by ${closedByUserId}`);
+  const ticketSnapshot = ticketState.get(channelId) || ticketFromDbRow(await getTicketByChannelId(channelId).catch((err) => {
+    console.error(`[finalize-vouch] getTicketByChannelId failed for ${channelId}:`, err.message);
+    return null;
+  }));
   ticketState.delete(channelId);
   clearTicketNotes(channelId);
   try {
     await closeTicket(channelId, closedByUserId);
+    console.log(`[finalize-vouch] Ticket ${channelId} marked as closed in DB.`);
   } catch (e) {
-    console.error('[finalizeTicket] closeTicket failed', e?.message, channelId);
+    console.error('[finalize-vouch] closeTicket failed', e?.message, channelId);
   }
-  await sendTranscript(channel, closedByUserId, ticketSnapshot).catch(() => null);
+  console.log(`[finalize-vouch] Sending transcript for ${channelId}...`);
+  await sendTranscript(channel, closedByUserId, ticketSnapshot).catch((err) => {
+    console.error(`[finalize-vouch] sendTranscript failed for ${channelId}:`, err.message);
+  });
+  console.log(`[finalize-vouch] Scheduling deletion for ${channelId} in 5s...`);
   setTimeout(async () => {
     const fresh = await channel.guild.channels.fetch(channelId).catch(() => null);
     if (!fresh) return;
-    await fresh.delete(`Auto-closed after vouch by ${closedByUserId}`).catch(() => null);
-  }, 3000);
+    await fresh.delete(`Auto-closed after vouch by ${closedByUserId}`).catch((err) => {
+      console.error(`[finalize-vouch] Failed to delete channel ${channelId}:`, err.message);
+    });
+  }, 5000);
 }
 function extractTicketMeta(topic) {
   if (!topic) return {};
@@ -1600,19 +1617,15 @@ async function repairTicketChannel(channel, ticket) {
     if (panelMessage) ticket.msgId = panelMessage.id;
   }
 
+  console.log(`[repair-debug] Channel ${channel.id} overwrites updated. Syncing state...`);
   ticketState.set(channel.id, ticket);
-  await updateTicketMessage(channel, ticket).catch(() => null);
+  await updateTicketMessage(channel, ticket).catch((err) => console.error(`[repair-debug] updateTicketMessage failed for ${channel.id}:`, err.message));
   return { ok: true, claimed: Boolean(ticket.claimed), msgId: ticket.msgId || null };
 }
 async function registerCommands() {
   const rest = new REST({ version: '10' }).setToken(env.token);
   try {
-    console.log(`[setup] Cleaning up ALL current commands to prevent duplication...`);
-    await rest.put(Routes.applicationCommands(env.clientId), { body: [] });
-    if (env.guildId) {
-      await rest.put(Routes.applicationGuildCommands(env.clientId, env.guildId), { body: [] });
-    }
-    
+    console.log(`[setup] Registering ${commands.length} commands...`);
     if (env.guildId) {
       console.log(`[setup] Registering NEW commands for GUILD: ${env.guildId}...`);
       await rest.put(Routes.applicationGuildCommands(env.clientId, env.guildId), { body: commands });
@@ -3729,6 +3742,7 @@ async function handleModal(interaction) {
       return;
     }
     const helperUser = await client.users.fetch(helperId).catch(() => null);
+    console.log(`[vouch-debug] Helper found: ${helperUser?.tag || 'null'} (ID: ${helperId})`);
     if (!helperUser) {
       await replyV2(interaction, 'User Not Found', ['I could not find that helper user.'], {
         ephemeral: true,
@@ -3736,16 +3750,18 @@ async function handleModal(interaction) {
       });
       return;
     }
-    const gameLabel = GAME_LABEL[gameRaw] || gameRaw;
+    const gameLabel = getGameLabel(gameRaw, gameRaw);
     const baseStats = await getHelperStats(interaction.guild.id, helperId).catch(() => ({
       total: 0, average: 0, fiveStarRate: 0, topGame: gameRaw
     }));
+    console.log(`[vouch-debug] Base stats for helper: ${JSON.stringify(baseStats)}`);
     const nextTotal = baseStats.total + 1;
     const nextAverage = Number((((baseStats.average * baseStats.total) + rating) / nextTotal).toFixed(2));
     const nextFiveStarCount = Math.round((baseStats.fiveStarRate / 100) * baseStats.total) + (rating === 5 ? 1 : 0);
     const nextFiveStarRate = Number(((nextFiveStarCount / nextTotal) * 100).toFixed(1));
     const helperAvatarUrl = helperUser.displayAvatarURL({ extension: 'png', size: 256, forceStatic: true });
     const clientAvatarUrl = interaction.user.displayAvatarURL({ extension: 'png', size: 256, forceStatic: true });
+    console.log(`[vouch-debug] Starting image generation for ${helperUser.tag}...`);
     const { buffer: card, dayKey } = await buildVouchCard({
       clientTag: interaction.user.tag,
       helperTag: helperUser.tag,
@@ -3763,9 +3779,11 @@ async function handleModal(interaction) {
         topGame: baseStats.topGame === 'N/A' ? gameRaw : baseStats.topGame
       }
     });
+    console.log(`[vouch-debug] Image generated successfully for ${helperUser.tag}`);
     const attachment = new AttachmentBuilder(card, { name: `vouch-${interaction.user.id}-${Date.now()}.png` });
     const targetChannelId = env.vouchChannelId || interaction.channel.id;
     const targetChannel = await interaction.guild.channels.fetch(targetChannelId).catch(() => null);
+    console.log(`[vouch-debug] Target channel for vouch: ${targetChannel?.name || 'null'} (ID: ${targetChannelId})`);
     if (!targetChannel || !targetChannel.isTextBased()) {
       await replyV2(interaction, 'Channel Error', ['Vouch channel is not configured correctly.'], {
         ephemeral: true,
@@ -3786,8 +3804,7 @@ async function handleModal(interaction) {
       ticketState.set(interaction.channel.id, ticket);
       await updateTicketMessage(interaction.channel, ticket).catch(() => null);
     }
-    try {
-      await createVouch({
+    const vouchData = {
         guild_id: interaction.guild.id,
         user_id: interaction.user.id,
         helper_user_id: helperId,
@@ -3797,7 +3814,11 @@ async function handleModal(interaction) {
         message_id: sent.id,
         channel_id: targetChannel.id,
         created_at: new Date().toISOString()
-      });
+    };
+    console.log(`[vouch-debug] Saving vouch to DB: ${JSON.stringify(vouchData)}`);
+    try {
+      await createVouch(vouchData);
+      console.log(`[vouch-debug] Vouch saved successfully to DB for ${helperUser.tag}`);
 
       const performance = await updateHelperStreak(helperId, rating === 5).catch(() => null);
       await updateUserReputation(interaction.user.id, 1).catch(() => null);
