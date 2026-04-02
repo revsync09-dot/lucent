@@ -1765,6 +1765,17 @@ client.on('interactionCreate', async (interaction) => {
 client.on('messageCreate', async (message) => {
   if (!message.inGuild() || message.author?.bot) return;
 
+  const normalizedContent = String(message.content || '').trim().toLowerCase();
+  if (normalizedContent === 'vouch panel') {
+    const { ownerId, gameKey } = extractTicketMeta(message.channel?.topic);
+    if (ownerId && gameKey) {
+      const member = await message.guild.members.fetch(message.author.id).catch(() => null);
+      if (member && (isHelperForGame(member, gameKey) || isStaff(member) || isOwner(message.author.id))) {
+        await message.channel.send(vouchPanelPayload()).catch(() => null);
+      }
+    }
+  }
+
   await statusServer.handleModmailReply(message).catch(() => null);
   await incrementUserMessageCount(message.guild.id, message.author.id).catch(() => null);
   await storePendingMessage(message.guild.id, message.id, message.author.id).catch(() => null);
@@ -2856,19 +2867,7 @@ async function executeTicketCreation(interaction, gameKey, ign, request, joinMet
     const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
     const booster = isBooster(member);
     const ticketNum = await getNextTicketNumber(interaction.guild, gameKey, categoryId, booster);
-    
-    // Sanitize channel name to avoid Discord's forbidden words for Server Discovery
-    const sanitizeChannelName = (name) => {
-      const FORBIDDEN_WORDS = ['carry', 'boost', 'trading', 'trade', 'sell', 'buy', 'free', 'money'];
-      let sanitized = name.toLowerCase();
-      for (const word of FORBIDDEN_WORDS) {
-        sanitized = sanitized.replace(new RegExp(`\\b${word}\\b`, 'gi'), 'run');
-      }
-      return sanitized;
-    };
-    
-    const baseName = booster ? `booster-ticket-${ticketNum}` : `${gameKey.toLowerCase()}-c-${ticketNum}`;
-    const channelName = sanitizeChannelName(baseName);
+    const channelName = booster ? `booster-ticket-${ticketNum}` : `${gameKey.toLowerCase()}-carry-${ticketNum}`;
 
     for (const roleId of allHelperRoleIds) {
       if (!roleId || String(roleId) === String(helperRoleId) || String(roleId) === String(staffRoleId) || String(roleId) === String(primaryStaffId)) continue;
